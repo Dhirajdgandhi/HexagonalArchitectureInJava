@@ -1,4 +1,4 @@
-package com.spring.boot.architecture.hexagonal.configuration;
+package com.spring.boot.twoTableEntity;
 //
 //import org.h2.server.web.WebServlet;
 //import org.springframework.boot.web.servlet.ServletRegistrationBean;

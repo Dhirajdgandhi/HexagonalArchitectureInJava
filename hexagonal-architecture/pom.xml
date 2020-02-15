@@ -5,8 +5,7 @@
 	<parent>
 		<groupId>com.spring</groupId>
 		<artifactId>projects</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<groupId>com.spring.boot.architecture</groupId>
 	<artifactId>hexagonal</artifactId>
