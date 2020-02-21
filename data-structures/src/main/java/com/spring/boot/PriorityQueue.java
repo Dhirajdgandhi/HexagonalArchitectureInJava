@@ -1,26 +1,22 @@
 package com.spring.boot;
 
+import Assignment1.Nodes.NodeBase;
+
 import java.util.*;
 
 /**
  * Priority Queue implemented as an ArrayList
  * */
-public class PriorityQueue<T> implements Collection {
+public class PriorityQueue<T extends NodeBase> implements Collection {
 
     private List<T> queue = new ArrayList<T>();
     static HeapSort heapSort;
-    private Comparator comparator = Comparator.naturalOrder(); // Defaulted to Natural Ordering
 
     public PriorityQueue() {
     }
 
     public PriorityQueue(int initialCapacity) {
         queue = new ArrayList<T>(initialCapacity);
-    }
-
-    public PriorityQueue(int initialCapacity, Comparator comparator) {
-        queue = new ArrayList<T>(initialCapacity);
-        this.comparator = comparator;
     }
 
     public PriorityQueue(ArrayList<T> array){
@@ -30,7 +26,7 @@ public class PriorityQueue<T> implements Collection {
 
     static
     {
-        heapSort = new HeapSort();
+        heapSort = new HeapSort<NodeBase>();
     }
 
     public void insert(T node){
@@ -41,7 +37,8 @@ public class PriorityQueue<T> implements Collection {
 
         while(nodeIndex > 1 // We don't reach root of tree
                 && // There' a Violation with Parent
-                comparator.compare(queue.get(nodeIndex/2), queue.get(nodeIndex)) == 1){
+//MAX HEAP                queue.get(nodeIndex).compareTo(queue.get(nodeIndex/2)) == 1){
+                queue.get(nodeIndex/2).compareTo(queue.get(nodeIndex)) == 1){ //MIN HEAP
 
             int parentIndex = (int)Math.floor((nodeIndex+1)/2)-1;
             //Swap with Parent
@@ -54,7 +51,7 @@ public class PriorityQueue<T> implements Collection {
         return queue.get(0); //Simply the top element of the QUEUE
     }
 
-    public T deleteHighestPriority(){
+    public T returnAndDeleteHighestPriority(){
         T highestNode = queue.get(0); //Simply the top element of the QUEUE
         List<T> array = new ArrayList<T>();
         array.addAll(queue.subList(1, queue.size()));

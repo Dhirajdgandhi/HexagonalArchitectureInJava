@@ -16,8 +16,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>hexagonal-architecture</module>
-        <module>data-structures</module>
+<!--        <module>hexagonal-architecture</module>-->
+<!--        <module>data-structures</module>-->
         <module>rutgers</module>
     </modules>
 
