@@ -2,7 +2,7 @@ package AI.Assignment1.Algo;
 
 import Assignment1.Nodes.BlockNode;
 import Assignment1.Nodes.NodeBase;
-import com.spring.boot.PriorityQueue;
+//import com.spring.boot.PriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -15,18 +15,18 @@ import static com.spring.boot.MathsCalc.calculateManhattanDistance;
 public class RepeatedAStarSearch {
 
     private static final Logger LOG = LoggerFactory.getLogger(RepeatedAStarSearch.class.getName());
-    static final int INFINITY = Integer.MAX_VALUE;
+    static final int INFINITY = 999999999;
     static final int BLOCKED_CELL = INFINITY;
     private int MAX_X, MAX_Y;
     private static int MIN_X, MIN_Y = 0;
     private GridWorld<Integer> gridWorld;
 
     private PriorityQueue<NodeBase> openList;
-    private Map<Pair, Boolean> closedList;
+    private LinkedList closedList;
     private NodeBase startNode;
     private NodeBase goalNode;
     private GridWorld<Integer> visitedGridWorld;
-    private GridWorld<Integer> visibleGridWorld = new GridWorld<>();
+    private GridWorld<Integer> visibleGridWorld;
 
     public RepeatedAStarSearch() {
     }
@@ -35,7 +35,6 @@ public class RepeatedAStarSearch {
         this.MAX_X = gridWorld.rowSize();
         this.MAX_Y = gridWorld.colSize();
         this.gridWorld = gridWorld;
-        this.visitedGridWorld = new GridWorld(gridWorld);
 
         startNode = new BlockNode();
         startNode.setName("S");
@@ -52,35 +51,59 @@ public class RepeatedAStarSearch {
 
     /** The Repeated AStar Algorithm Main Function
      * */
-    public int search(){
+    public int search(boolean backward){
+        // initialize for every search
+        this.visitedGridWorld = new GridWorld(0, gridWorld.rowSize(), gridWorld.colSize());
+        this.visibleGridWorld = new GridWorld(0, gridWorld.rowSize(), gridWorld.colSize());
+
         NodeBase currentNode = this.startNode;
         int counter=0;
+        int cost=0;
 
-        while (!currentNode.getXy().equals(goalNode.getXy())){
+        while (!currentNode.equals(goalNode)){
             counter+=1;
-            currentNode.setgValue(0); // Takes no cost to reach where we are
-            visitedGridWorld.set(currentNode.getXy(), counter);
-            openList =  new PriorityQueue<>(50000);
-            closedList = new HashMap<>();
 
-            openList.insert(currentNode);
+            currentNode.setgValue(0); // Takes no cost to reach where we are
+            currentNode.sethValue(calculateManhattanDistance(currentNode.getXy(),goalNode.getXy()));
+            currentNode.calculateAndSetFValue();
+
+            goalNode.setgValue(INFINITY);
+            goalNode.sethValue(0);
+            goalNode.calculateAndSetFValue();
+            visitedGridWorld.set(goalNode.getXy(), counter);
+            visitedGridWorld.set(currentNode.getXy(), counter);
+
+            openList =  new PriorityQueue<>(50000);
+            closedList = new LinkedList<>();
+
+            openList.add(currentNode);
 
             // See your visible cells and update your Visible World
             for ( Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)){
                 if (isCellLegal(neighbour)) visibleGridWorld.set(neighbour, gridWorld.get(neighbour));
             }
 
-            computePath(visibleGridWorld, currentNode, counter);
+            computePath(currentNode, counter);
 
             if (!openList.isEmpty()){
                 NodeBase node = goalNode;
-                while(!node.equals(currentNode)){
+                List<Pair<Integer, Integer>> plannedPath = new ArrayList<>();
+
+                do{
+                    plannedPath.add(node.getXy());
                     node.getParentNode().setChildNode(node);
                     node = node.getParentNode();
-                } // Stops at the Current Node
-                // Execution
-                while(! isCellLegalAndUnBlocked(gridWorld, node.getChildNode().getXy())){
+                } while(!node.equals(currentNode)); // Stops at the Current Node
+                plannedPath.add(node.getXy());
+                Collections.reverse(plannedPath);
+                LOG.info("Planned Path for execution is : {}", plannedPath);
+
+                // Execution uses Real Grid World
+                LOG.info("Execution Begins");
+                while(node.getChildNode()!=null && isCellLegalAndUnBlocked(gridWorld, node.getChildNode().getXy())){
                     node = node.getChildNode();
+                    cost+=1;
+                    LOG.info("Moved to Cell : {}", node.getXy());
                 }
                 // Run AStar with currentNode again
                 currentNode = node;
@@ -89,20 +112,24 @@ public class RepeatedAStarSearch {
                 return -1;
             }
         }
-        return -1;
+        return cost;
     }
 
     /** AStar Algorithm to compute Path with Start and Goal node
      * */
-    private void computePath(GridWorld<Integer> visibleGridWorld, NodeBase startNode,int counter){
+    private void computePath(NodeBase startNode,int counter){
         NodeBase currentNode =  startNode;
 
-        while( goalNode.getgValue() > currentNode.getfValue()){
-            closedList.put(currentNode.getXy(), true);
+        while( currentNode!=null && goalNode.getgValue() > currentNode.getfValue()){
+            LOG.info("Exploring Node : {} : {}",currentNode.getXy(), currentNode);
+            closedList.add(currentNode.getXy());
 
             for (Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)){
-                if(!isCellLegalAndUnBlocked(visibleGridWorld, neighbour)) {
+                if(isCellLegalAndUnBlocked(visibleGridWorld, neighbour)) {
                     NodeBase neighbourNode = new BlockNode();
+                    if(goalNode.getXy().equals(neighbour)){
+                        neighbourNode = goalNode;
+                    }
                     neighbourNode.setXy(neighbour);
 
                     if (visitedGridWorld.get(neighbour) < counter) {
@@ -110,19 +137,30 @@ public class RepeatedAStarSearch {
                         visitedGridWorld.set(neighbour, counter);
                     }
 
-                    if (neighbourNode.getgValue() > currentNode.getgValue() + gridWorld.get(currentNode.getXy())){// g' > g(s) + c(a,s)
-                        neighbourNode.setgValue(currentNode.getgValue() + gridWorld.get(currentNode.getXy()));
+                    if (neighbourNode.getgValue() > currentNode.getgValue() + 1){// g' > g(s) + c(a,s) // c(a,s) = someGrid.get(currentNode.getXy())
+                        neighbourNode.setgValue(currentNode.getgValue() + 1);
                         neighbourNode.setParentNode(currentNode);
                         neighbourNode.sethValue(calculateManhattanDistance(neighbour, goalNode.getXy()));
                         neighbourNode.calculateAndSetFValue();
 
-                        if (openList.contains(neighbourNode)) openList.remove(neighbourNode);// TODO: Improve from Linear Search and  write remove function
+                        if (openList.contains(neighbourNode)){
+                            openList.remove(neighbourNode);// TODO: Improve from Linear Search and  write remove function
+                        }
                         LOG.info("Adding Neighbour to Open List : {}",neighbourNode);
-                        openList.insert(neighbourNode);
+                        openList.add(neighbourNode);
 
                     }
                 }
             }
+            //Remove he current Node that we explored from top of Open List
+            openList.poll();
+            // Get the next Top of Open List if it's not empty
+            if (!openList.isEmpty()){
+                currentNode = openList.peek();
+            } else {
+                currentNode = null;
+            }
+            LOG.info("\n\n\n");
         }
     }
 
@@ -141,7 +179,7 @@ public class RepeatedAStarSearch {
 
     /**
      * Get the Optimal Path Cost to the Goal
-     * @param environment States the problem in terms of a Collection like a Matrix
+     * environment States the problem in terms of a Collection like a Matrix
      *          or a LinkedList or a HashMap or a composition of all these
      * @return Optimal Cost to the GOAL
      *          -1 : If there's no way to REACH THE GOAL
@@ -149,7 +187,7 @@ public class RepeatedAStarSearch {
 
 
     private Boolean isCellLegal(Pair<Integer, Integer> cell){
-        return cell.getFirst() >= MIN_X  && cell.getFirst() <= MAX_X && cell.getSecond() >= MIN_Y && cell.getSecond() <= MAX_Y;
+        return cell.getFirst() >= MIN_X  && cell.getFirst() < MAX_X && cell.getSecond() >= MIN_Y && cell.getSecond() < MAX_Y;
     }
 
     /**
@@ -158,7 +196,18 @@ public class RepeatedAStarSearch {
      * @param A Co-ordinates of the cell to be checked
      * @return True if the Cell is Blocked
      * */
-    private Boolean isCellLegalAndUnBlocked(GridWorld gridWorld, Pair<Integer, Integer> A){
-        return isCellLegal(A) && gridWorld.get(A).equals(BLOCKED_CELL);
+    private Boolean isCellLegalAndUnBlocked(GridWorld gridWorldrep, Pair<Integer, Integer> A){
+        return isCellLegal(A) && !gridWorldrep.get(A).equals(BLOCKED_CELL);
+    }
+
+    public void printPathToGoal(){
+        LOG.info("Path to Goal : ");
+        NodeBase node = startNode;
+        List plannedPath = new ArrayList();
+        do{
+            plannedPath.add(node.getXy());
+            node = node.getChildNode();
+        } while(node!=null); // Stops at the Current Node
+        LOG.info("Planned Path for execution is : {}", plannedPath);
     }
 }

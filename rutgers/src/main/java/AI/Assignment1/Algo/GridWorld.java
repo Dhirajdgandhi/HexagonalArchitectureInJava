@@ -3,13 +3,26 @@ package AI.Assignment1.Algo;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class GridWorld<T> {
     private List<List<T>> gridWorld;
 
     public GridWorld() {
+    }
+
+    public GridWorld(T value, int row, int col) {
+        this.gridWorld = new ArrayList<>();
+        // Deep Copy GridWorld to VisitedWorld
+        IntStream.range(0,row).forEach(i -> {
+            this.gridWorld.add(new ArrayList<>());
+            IntStream.range(0,col).forEach(j -> {
+                this.gridWorld.get(i).add(value);
+            });
+        });
     }
 
     public GridWorld(List<List<T>> gridWorld) {
@@ -67,5 +80,24 @@ public class GridWorld<T> {
             System.out.println("");
         }
     }
+
+    public void generateMaze(T INFINITY){
+
+        // Deep Copy GridWorld to VisitedWorld
+        IntStream.range(0,rowSize()).forEach(i -> {
+            IntStream.range(0,colSize()).forEach(j -> {
+
+                // 30% - Block
+                // 70% - Free
+
+                Random r = new Random();
+                int randomResult = r.nextInt(100);
+                if(randomResult<=30){
+                    this.gridWorld.get(i).set(j,INFINITY);
+                }
+            });
+        });
+    }
+
 
 }

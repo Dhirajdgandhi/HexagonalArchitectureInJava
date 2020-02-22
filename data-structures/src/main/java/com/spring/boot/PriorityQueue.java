@@ -31,7 +31,7 @@ public class PriorityQueue<T extends NodeBase> implements Collection {
 
     public void insert(T node){
         int length = queue.size();
-        ((ArrayList<T>)queue).ensureCapacity(length+1); //Increase capacity
+//        ((ArrayList<T>)queue).ensureCapacity(length+1); //Increase capacity
         queue.add(length, node);// Insert node to end
         int nodeIndex = length;
 
@@ -97,6 +97,12 @@ public class PriorityQueue<T extends NodeBase> implements Collection {
 
     @Override
     public boolean remove(Object o) {
+        //TODO: Improve this implementation. Currently it is order of nlogn
+        int index = queue.indexOf(o);
+        List newQueue = queue.subList(0,index+1);
+        newQueue.addAll(index+1,queue.subList(index+1,queue.size()-1)) ;
+        queue = newQueue;
+        heapSort.maxHeapify(queue, 0, queue.size() - 1);
         return false;
     }
 
