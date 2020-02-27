@@ -16,7 +16,7 @@ public class AStar extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("javafx.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("../../../../resources/javafx.fxml"));
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();

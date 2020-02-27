@@ -1,12 +1,14 @@
 package AI.Assignment1.Algo;
 
+//import com.spring.boot.PriorityQueue;
+
 import Assignment1.Nodes.BlockNode;
 import Assignment1.Nodes.NodeBase;
-//import com.spring.boot.PriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 
+import javax.xml.soap.Node;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -27,6 +29,7 @@ public class RepeatedAStarSearch {
     private NodeBase goalNode;
     private GridWorld<Integer> visitedGridWorld;
     private GridWorld<Integer> visibleGridWorld;
+    private int expandedNodes;
 
     public RepeatedAStarSearch() {
     }
@@ -39,19 +42,21 @@ public class RepeatedAStarSearch {
         startNode = new BlockNode();
         startNode.setName("S");
         startNode.setDescription("The Game begins from this position");
-        startNode.setgValue(0);
+        startNode.setGValue(0);
         startNode.setXy(initialCell);
 
         goalNode = new BlockNode();
         goalNode.setName("G");
         goalNode.setDescription("The Game ends at this position");
-        goalNode.setgValue(INFINITY);
+        goalNode.setGValue(INFINITY);
         goalNode.setXy(goalCell);
     }
 
     /** The Repeated AStar Algorithm Main Function
      * */
-    public int search(boolean backward){
+    public int search(boolean backward) throws CloneNotSupportedException {
+        List executedPath = new ArrayList();
+
         // initialize for every search
         this.visitedGridWorld = new GridWorld(0, gridWorld.rowSize(), gridWorld.colSize());
         this.visibleGridWorld = new GridWorld(0, gridWorld.rowSize(), gridWorld.colSize());
@@ -63,65 +68,101 @@ public class RepeatedAStarSearch {
         while (!currentNode.equals(goalNode)){
             counter+=1;
 
-            currentNode.setgValue(0); // Takes no cost to reach where we are
-            currentNode.sethValue(calculateManhattanDistance(currentNode.getXy(),goalNode.getXy()));
-            currentNode.calculateAndSetFValue();
-
-            goalNode.setgValue(INFINITY);
-            goalNode.sethValue(0);
-            goalNode.calculateAndSetFValue();
+            // Same for B and F
             visitedGridWorld.set(goalNode.getXy(), counter);
             visitedGridWorld.set(currentNode.getXy(), counter);
 
+            // Same for B and F
             openList =  new PriorityQueue<>(50000);
             closedList = new LinkedList<>();
 
-            openList.add(currentNode);
-
             // See your visible cells and update your Visible World
+            // Same for B and F
             for ( Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)){
-                if (isCellLegal(neighbour)) visibleGridWorld.set(neighbour, gridWorld.get(neighbour));
+                if (isCellLegal(neighbour)){
+                    visibleGridWorld.set(neighbour, gridWorld.get(neighbour));
+                }
             }
 
-            computePath(currentNode, counter);
+            // If Backward then switch the goal node and current node
+            if (!backward){
+                computePath(currentNode, goalNode, counter);
+            } else{
+                computePath(goalNode, currentNode, counter);
+            }
 
             if (!openList.isEmpty()){
-                NodeBase node = goalNode;
-                List<Pair<Integer, Integer>> plannedPath = new ArrayList<>();
+                NodeBase node;
+                List<NodeBase> plannedPath = new ArrayList<>();
 
-                do{
-                    plannedPath.add(node.getXy());
-                    node.getParentNode().setChildNode(node);
-                    node = node.getParentNode();
-                } while(!node.equals(currentNode)); // Stops at the Current Node
-                plannedPath.add(node.getXy());
-                Collections.reverse(plannedPath);
-                LOG.info("Planned Path for execution is : {}", plannedPath);
+                if(!backward){ // For Forward reverse the linked path found from G->S to S->G
+                    node = goalNode;
+                    do{
+                        plannedPath.add(node);
+                        node.getParentNode().setChildNode(node);
+                        node = node.getParentNode();
+                    } while(!node.equals(currentNode)); // Stops at the Current Node
+                    plannedPath.add(node);
+                    Collections.reverse(plannedPath);
+                } else{ // For backward simply add everything to lists as we have our linked list from S->G
+                    node = currentNode;
+                    while (node!=null){
+                        plannedPath.add(node);
+                        node = node.getParentNode();
+                    }
+                    node = currentNode; // Reset node to the current position
+                }
+
+                LOG.debug("Planned Path for execution is : {}", plannedPath);
 
                 // Execution uses Real Grid World
-                LOG.info("Execution Begins");
-                while(node.getChildNode()!=null && isCellLegalAndUnBlocked(gridWorld, node.getChildNode().getXy())){
-                    node = node.getChildNode();
-                    cost+=1;
-                    LOG.info("Moved to Cell : {}", node.getXy());
+                LOG.debug("Execution Begins");
+                for (NodeBase cellNode : plannedPath.subList(1,plannedPath.size())) {
+                    if(isCellLegalAndUnBlocked(gridWorld, cellNode.getXy())){
+                        cost+=1;
+                        executedPath.add(cellNode.getXy());
+                        LOG.debug("Moved to Cell : {}", cellNode.getXy());
+                        currentNode = cellNode;
+                    } else{
+                        // Run AStar with currentNode again
+                        break;
+                    }
                 }
-                // Run AStar with currentNode again
-                currentNode = node;
+
             } else{
                 LOG.info("NO PATH to target can be found.");
                 return -1;
             }
         }
+
+        LOG.info("Executed Path : {}",executedPath);
         return cost;
+    }
+
+    private NodeBase getLinkForPath(boolean backward, NodeBase node){
+        // For forward use ChildNode connections
+        // For backward use ParentNode connections
+        return !backward ? node.getChildNode() : node.getParentNode();
     }
 
     /** AStar Algorithm to compute Path with Start and Goal node
      * */
-    private void computePath(NodeBase startNode,int counter){
+    private void computePath(NodeBase startNode, NodeBase goalNode, int counter){
+        startNode.setParentNode(null);
+        startNode.setGValue(0); // Takes no cost to reach where we are
+        startNode.setHValue(calculateManhattanDistance(startNode.getXy(),goalNode.getXy()));
+        startNode.calculateAndSetFValue();
+
+        openList.add(startNode);
+
+        goalNode.setParentNode(null);
+        goalNode.setGValue(INFINITY);
+        goalNode.setHValue(0);
+        goalNode.calculateAndSetFValue();
         NodeBase currentNode =  startNode;
 
-        while( currentNode!=null && goalNode.getgValue() > currentNode.getfValue()){
-            LOG.info("Exploring Node : {} : {}",currentNode.getXy(), currentNode);
+        while( currentNode!=null && goalNode.getGValue() > currentNode.getFValue()){
+            LOG.debug("Exploring Node : {} : {}",currentNode.getXy(), currentNode);
             closedList.add(currentNode.getXy());
 
             for (Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)){
@@ -133,22 +174,21 @@ public class RepeatedAStarSearch {
                     neighbourNode.setXy(neighbour);
 
                     if (visitedGridWorld.get(neighbour) < counter) {
-                        neighbourNode.setgValue(INFINITY);
+                        neighbourNode.setGValue(INFINITY);
                         visitedGridWorld.set(neighbour, counter);
                     }
 
-                    if (neighbourNode.getgValue() > currentNode.getgValue() + 1){// g' > g(s) + c(a,s) // c(a,s) = someGrid.get(currentNode.getXy())
-                        neighbourNode.setgValue(currentNode.getgValue() + 1);
+                    if (neighbourNode.getGValue() > currentNode.getGValue() + 1){// g' > g(s) + c(a,s) // c(a,s) = someGrid.get(currentNode.getXy())
+                        neighbourNode.setGValue(currentNode.getGValue() + 1);
                         neighbourNode.setParentNode(currentNode);
-                        neighbourNode.sethValue(calculateManhattanDistance(neighbour, goalNode.getXy()));
+                        neighbourNode.setHValue(calculateManhattanDistance(neighbour, goalNode.getXy()));
                         neighbourNode.calculateAndSetFValue();
 
                         if (openList.contains(neighbourNode)){
                             openList.remove(neighbourNode);// TODO: Improve from Linear Search and  write remove function
                         }
-                        LOG.info("Adding Neighbour to Open List : {}",neighbourNode);
+                        LOG.debug("Adding Neighbour to Open List : {}",neighbourNode);
                         openList.add(neighbourNode);
-
                     }
                 }
             }
@@ -160,13 +200,10 @@ public class RepeatedAStarSearch {
             } else {
                 currentNode = null;
             }
-            LOG.info("\n\n\n");
+            LOG.debug("\n\n\n");
         }
     }
 
-    public GridWorld<Integer> getVisibleGridWorld() {
-        return visibleGridWorld;
-    }
 
     /** Retrieves Neighbour List
      * */
@@ -192,7 +229,7 @@ public class RepeatedAStarSearch {
 
     /**
      * Checks if given Cell is blocked
-     * @param gridWorld Matrix of block cells
+     * @param gridWorldrep Matrix of block cells
      * @param A Co-ordinates of the cell to be checked
      * @return True if the Cell is Blocked
      * */
@@ -210,4 +247,9 @@ public class RepeatedAStarSearch {
         } while(node!=null); // Stops at the Current Node
         LOG.info("Planned Path for execution is : {}", plannedPath);
     }
+
+    public int getExpandedNodes() {
+        return expandedNodes;
+    }
+
 }
