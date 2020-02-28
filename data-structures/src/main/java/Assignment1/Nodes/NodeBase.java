@@ -4,29 +4,17 @@ import org.springframework.data.util.Pair;
 
 public class NodeBase implements Comparable, Cloneable {
 
-    private String name = "";
-    private String description = "";
-    private int fValue = 0;
-    private int hValue = 1000000000; // Heuristic Cost
-    private int hnew = 1000000000; // Heuristic Cost
-    private int gValue = 0; // Path Cost till this Cell
-
+    private String name = "", description = "";
+    private int fValue = 0, hValue = 0, gValue = 0;
     private Pair<Integer, Integer> xy; // Grid cell co-ordinates
-    private NodeBase parentNode;
-    private NodeBase childNode;
+    private NodeBase parentNode, childNode;
+    private int visited = 0, visible = 0;
 
-    public void calculateAndSetFValue(){
-        this.fValue = this.gValue + this.hValue;
+    public NodeBase() {
     }
 
-    @Override
-    public int compareTo(Object o) {
-        return Integer.compare(fValue, ((NodeBase)o).fValue);
-    }
-
-    @Override
-    public NodeBase clone() throws CloneNotSupportedException {
-        return (NodeBase)super.clone();
+    public NodeBase(Pair<Integer, Integer> xy) {
+        this.xy = xy;
     }
 
     public String getName() {
@@ -43,10 +31,6 @@ public class NodeBase implements Comparable, Cloneable {
 
     public int getHValue() {
         return this.hValue;
-    }
-
-    public int getHnew() {
-        return this.hnew;
     }
 
     public int getGValue() {
@@ -81,10 +65,21 @@ public class NodeBase implements Comparable, Cloneable {
         this.hValue = hValue;
     }
 
-    public void setHnew(int hnew) {
-        this.hnew = hnew;
+    public int getVisited() {
+        return visited;
     }
 
+    public void setVisited(int visited) {
+        this.visited = visited;
+    }
+
+    public int getVisible() {
+        return visible;
+    }
+
+    public void setVisible(int visible) {
+        this.visible = visible;
+    }
     public void setGValue(int gValue) {
         this.gValue = gValue;
     }
@@ -101,19 +96,33 @@ public class NodeBase implements Comparable, Cloneable {
         this.childNode = childNode;
     }
 
-    public boolean equals(final Object o) {
-        if (o == this) return true;
-        if (!(o instanceof NodeBase)) return false;
-        final NodeBase other = (NodeBase) o;
-        if (!other.canEqual((Object) this)) return false;
-        final Object this$xy = this.getXy();
-        final Object other$xy = other.getXy();
-        if (this$xy == null ? other$xy != null : !this$xy.equals(other$xy)) return false;
-        return true;
+    public void calculateAndSetFValue(){
+        this.fValue = this.gValue + this.hValue;
     }
 
-    protected boolean canEqual(final Object other) {
-        return other instanceof NodeBase;
+    public NodeBase getLinkForPath(boolean backward){
+        // For forward use ChildNode connections
+        // For backward use ParentNode connections
+        return !backward ? childNode : parentNode;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        NodeBase node = (NodeBase)o;
+//        if(fValue == node.getFValue()){
+//            return Integer.compare(node.getGValue(), gValue );
+//        }
+        return Integer.compare(fValue, node.getFValue());
+    }
+
+    @Override
+    public NodeBase clone() throws CloneNotSupportedException {
+        return (NodeBase)super.clone();
+    }
+
+    public boolean equals(final Object o) {
+        final NodeBase other = (NodeBase) o;
+        return this.getXy().equals(other.getXy());
     }
 
     public int hashCode() {
@@ -124,7 +133,17 @@ public class NodeBase implements Comparable, Cloneable {
         return result;
     }
 
+//    public String toString() {
+//        return "NodeBase(name=" + this.getName() + ", description=" + this.getDescription() + ", fValue=" + this.getFValue() + ", hValue=" + this.getHValue() + ", gValue=" + this.getGValue() + ", xy=" + this.getXy() + ", parentNode=" + this.getParentNode() + ", childNode=" + this.getChildNode() + ")";
+//    }
+
+    @Override
     public String toString() {
-        return "NodeBase(name=" + this.getName() + ", description=" + this.getDescription() + ", fValue=" + this.getFValue() + ", hValue=" + this.getHValue() + ", hnew=" + this.getHnew() + ", gValue=" + this.getGValue() + ", xy=" + this.getXy() + ", parentNode=" + this.getParentNode() + ", childNode=" + this.getChildNode() + ")";
+        Pair parent = null;
+        if(getParentNode()!=null){
+            parent = getParentNode().getXy();
+        }
+        return "Node :"+getXy()+ " Parent:"+ parent;
     }
+
 }

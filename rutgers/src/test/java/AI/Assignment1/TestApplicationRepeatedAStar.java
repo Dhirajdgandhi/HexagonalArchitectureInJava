@@ -23,20 +23,20 @@ public class TestApplicationRepeatedAStar {
     static final int INFINITY = 999999999;
     long startTime, endTime;
 
-    public void startTimer(){
+    public void startTimer() {
         startTime = System.nanoTime();
     }
 
-    public void endTimer(){
+    public void endTimer() {
         endTime = System.nanoTime();
     }
 
     @Test
-    public void run(){
+    public void run() {
         List<Integer> sumCost = new ArrayList();
         sumCost.add(0);
         int runs = 100;
-        IntStream.range(0,runs).forEach(i -> {
+        IntStream.range(0, runs).forEach(i -> {
             try {
                 int cost = repeatedForwardAStarSearch();
                 sumCost.set(0, sumCost.get(0) + cost);
@@ -46,18 +46,18 @@ public class TestApplicationRepeatedAStar {
             }
         });
 
-        LOG.info("The average cost over {}runs for all the AStar Search is : {}steps", runs, sumCost.get(0)/runs);
+        LOG.info("The average cost over {}runs for all the AStar Search is : {}steps", runs, sumCost.get(0) / runs);
 
     }
 
     public int repeatedForwardAStarSearch() throws CloneNotSupportedException {
 
-        int MAX_ROW=5;
-        int MAX_COL=5;
+        int MAX_ROW = 100;
+        int MAX_COL = 100;
 
-        Pair start = Pair.of(0,0);
-        Pair goal =  Pair.of(MAX_ROW-1,MAX_COL-1);
-        GridWorld gridWorld = new GridWorld(1, MAX_ROW,MAX_COL);
+        Pair start = Pair.of(0, 0);
+        Pair goal = Pair.of(MAX_ROW - 1, MAX_COL - 1);
+        GridWorld gridWorld = new GridWorld(1, MAX_ROW, MAX_COL);
 
         startTimer();
         gridWorld.generateMaze(INFINITY);
@@ -67,24 +67,31 @@ public class TestApplicationRepeatedAStar {
         gridWorld.set(start, 1);
         gridWorld.set(goal, 1);
 
-        gridWorld.printGridWorldState();
+//        gridWorld.printGridWorldState();
 
-        LOG.info("{} X {} Maze Generation Took : {} microsecs to be generated", MAX_ROW, MAX_COL, (endTime - startTime)/1000);
+        LOG.info("{} X {} Maze Generation Took : {} microsecs to be generated", MAX_ROW, MAX_COL, (endTime - startTime) / 1000);
 
         RepeatedAStarSearch repeatedForwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
-        int forwardCost = repeatedForwardAStarSearch.search(false);
+        int forwardCost = repeatedForwardAStarSearch.search(false, false);
         endTimer();
-        LOG.info("The Repeated AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime)/1000, forwardCost, repeatedForwardAStarSearch.getExpandedNodes());
+        LOG.info("The Repeated AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, forwardCost, repeatedForwardAStarSearch.getExpandedNodes());
 
         RepeatedAStarSearch repeatedBackwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
-        int backwardCost = repeatedBackwardAStarSearch.search(true);
+        int backwardCost = repeatedBackwardAStarSearch.search(true, false);
         endTimer();
-        LOG.info("The Repeated AStar Backward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime)/1000, backwardCost, repeatedForwardAStarSearch.getExpandedNodes());
+        LOG.info("The Repeated AStar Backward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, backwardCost, repeatedBackwardAStarSearch.getExpandedNodes());
 
-        if(forwardCost==-1) return repeatedForwardAStarSearch();
-        else return forwardCost;
+        RepeatedAStarSearch repeatedForwardAdaptiveAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
+        startTimer();
+        int adaptiveForwardCost = repeatedForwardAdaptiveAStarSearch.search(false, true);
+        endTimer();
+        LOG.info("The Repeated Adaptive AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, adaptiveForwardCost, repeatedForwardAdaptiveAStarSearch.getExpandedNodes());
+
+//        if(forwardCost==-1) return repeatedForwardAStarSearch();
+//        else return forwardCost;
+        return forwardCost;
     }
 
 }
