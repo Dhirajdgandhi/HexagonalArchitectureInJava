@@ -19,6 +19,7 @@
 <!--        <module>hexagonal-architecture</module>-->
         <module>data-structures</module>
         <module>rutgers</module>
+        <module>javafxUI</module>
     </modules>
 
     <properties>
