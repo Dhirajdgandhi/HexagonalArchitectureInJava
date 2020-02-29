@@ -1,26 +1,21 @@
-package AI.Assignment1;
+package com.rutgers.AI;
 
 import AI.Assignment1.Algo.GridWorld;
 import AI.Assignment1.Algo.RepeatedAStarSearch;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.util.Pair;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class TestApplicationRepeatedAStar {
+public class Test {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestApplicationRepeatedAStar.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Test.class.getName());
 
-    static final int INFINITY = 1000;
+    static final int INFINITY = 999999999;
     long startTime, endTime;
 
     public void startTimer() {
@@ -31,7 +26,6 @@ public class TestApplicationRepeatedAStar {
         endTime = System.nanoTime();
     }
 
-    @Test
     public void run() {
         List<Integer> sumCost = new ArrayList();
         sumCost.add(0);
@@ -50,7 +44,7 @@ public class TestApplicationRepeatedAStar {
 
     }
 
-    private int createMazeAndSearch() throws CloneNotSupportedException {
+    public int createMazeAndSearch() throws CloneNotSupportedException {
         int MAX_ROW = 50;
         int MAX_COL = 50;
 
@@ -63,11 +57,12 @@ public class TestApplicationRepeatedAStar {
         endTimer();
         LOG.info("{} X {} Maze Generation Took : {} microsecs to be generated", MAX_ROW, MAX_COL, (endTime - startTime) / 1000);
 
-        return repeatedForwardAStarSearch(gridWorld, MAX_ROW, MAX_COL);
+        return repeatedForwardAStarSearch(gridWorld);
     }
 
-    public int repeatedForwardAStarSearch(GridWorld gridWorld, int MAX_ROW, int MAX_COL) throws CloneNotSupportedException {
+    public int repeatedForwardAStarSearch(GridWorld gridWorld) throws CloneNotSupportedException {
 
+        int MAX_ROW = gridWorld.rowSize() , MAX_COL = gridWorld.colSize();
         Pair start = Pair.of(0, 0);
         Pair goal = Pair.of(MAX_ROW - 1, MAX_COL - 1);
 
@@ -76,7 +71,6 @@ public class TestApplicationRepeatedAStar {
         gridWorld.set(goal, 1);
 
         gridWorld.printGridWorldState();
-
         RepeatedAStarSearch repeatedForwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
         int forwardCost = repeatedForwardAStarSearch.search(false, false);
@@ -99,5 +93,4 @@ public class TestApplicationRepeatedAStar {
 //        else return forwardCost;
         return forwardCost;
     }
-
 }
