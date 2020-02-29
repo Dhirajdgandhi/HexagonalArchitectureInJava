@@ -67,7 +67,7 @@ public class RepeatedAStarSearch {
      * @param adaptive   True for adaptive search
      */
     public int search(boolean isBackward, boolean adaptive) throws CloneNotSupportedException {
-        List executedPath = new ArrayList();
+        List<Pair> executedPath = new ArrayList();
 
         NodeBase goalNode = stateGridWorld.get(goalCell);
         NodeBase currentNode = stateGridWorld.get(initialCell);
@@ -139,8 +139,6 @@ public class RepeatedAStarSearch {
                         cost += 1;
                         executedPath.add(cell);
                         LOG.debug("Moved to Cell : {}", cell);
-                        Main.grid.get(cell.getFirst()).get(cell.getSecond()).changeColor(Color.YELLOW);
-
                         currentNode = stateGridWorld.get(cell);
                         ;
                     } else {
@@ -156,6 +154,9 @@ public class RepeatedAStarSearch {
         }
 
         LOG.info("Executed Path : {}", executedPath);
+        for(Pair<Integer, Integer> cell : executedPath){
+            Main.grid.get(cell.getFirst()).get(cell.getSecond()).changeColor(Color.YELLOW);
+        }
         return cost;
     }
 
