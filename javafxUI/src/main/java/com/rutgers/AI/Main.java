@@ -38,13 +38,13 @@ public class Main  extends Application implements EventHandler {
     Stage window;
     Scene scene, scene2, scene3, scene4;
 
-    private static final int TILE_SIZE=50;
-    private static final int CELLS=5;
+    private static final int TILE_SIZE=10;
+    private static final int CELLS=50;
     private static final int SIZE=CELLS*TILE_SIZE;
     private List<List<Tile>> grid = new ArrayList<>();
 
-    Pair initialCell = Pair.of(0,0);
-
+    Pair<Integer, Integer> initialCell = Pair.of(0,0);
+    Pair<Integer, Integer> goalCell = Pair.of(CELLS-1,CELLS-1);
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -119,7 +119,7 @@ public class Main  extends Application implements EventHandler {
         {
             resetButton.setOnAction(e->{
                 grid = new ArrayList<>();
-                borderPane.setTop(createContent());
+                borderPane.setCenter(createContent());
             });
         }
 
@@ -157,6 +157,7 @@ public class Main  extends Application implements EventHandler {
                 }
             });
         });
+        setInitAndGoalCell();
     }
 //    private GridPane createMaze(){
 //        int rows = CELLS;
@@ -201,7 +202,6 @@ public class Main  extends Application implements EventHandler {
         Button startButton = new Button("Start");
         startButton.setOnAction(e-> {
             gridWorld = new GridWorld(1,grid.size(),grid.size());
-//            new Test().run();
             try {
 
                 IntStream.range(0, grid.size()).forEach(i -> {
@@ -289,7 +289,6 @@ public class Main  extends Application implements EventHandler {
     private Pane createContent(){
         root = new Pane();
         root.setPrefSize(SIZE,SIZE);
-//        root.setStyle("-fx-background-color: rgba(0,0,0,0.99);");
         initGrid();
         return root;
     }
@@ -306,12 +305,13 @@ public class Main  extends Application implements EventHandler {
                 root.getChildren().add(tile);
             });
         });
-        grid.get(0).get(0).border.setFill(Color.BLUE);
-        grid.get(4).get(4).border.setFill(Color.RED);
+        setInitAndGoalCell();
     }
 
-
-
+    private void setInitAndGoalCell(){
+        grid.get(initialCell.getFirst()).get(initialCell.getSecond()).border.setFill(Color.BLUE);
+        grid.get(goalCell.getFirst()).get(goalCell.getSecond()).border.setFill(Color.RED);
+    }
 
     public class Tile extends StackPane{
         private int x,y;
@@ -329,7 +329,7 @@ public class Main  extends Application implements EventHandler {
             setTranslateX(x * TILE_SIZE);
             setTranslateY(y * TILE_SIZE);
 
-            setOnMouseClicked(e -> block());
+            setOnMouseClicked(e -> flip());
         }
 
         public void block(){
@@ -337,7 +337,15 @@ public class Main  extends Application implements EventHandler {
                 text = new Text();
                 text.setText("X");
                 border.setFill(Color.BLACK);
+            }
+        }
 
+        public void flip(){
+            if(text.getText().isEmpty()){
+                block();
+            } else{
+                text.setText(null);
+                border.setFill(null);
             }
         }
 
