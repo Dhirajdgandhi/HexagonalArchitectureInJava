@@ -2,10 +2,13 @@ package AI.Assignment1.Algo;
 
 //import com.spring.boot.PriorityQueue;
 
+import AI.Assignment1.UI.Main;
 import Assignment1.Nodes.BlockNode;
 import Assignment1.Nodes.NodeBase;
+import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 
 import java.util.*;
@@ -15,6 +18,7 @@ import static com.spring.boot.MathsCalc.calculateManhattanDistance;
 public class RepeatedAStarSearch {
 
     private static final Logger LOG = LoggerFactory.getLogger(RepeatedAStarSearch.class.getName());
+
 
     static int MIN_X, MIN_Y = 0;
     static final int INFINITY = 999999999;
@@ -130,11 +134,13 @@ public class RepeatedAStarSearch {
 
                 // Execution uses Real Grid World
                 LOG.debug("Execution Begins");
-                for (Pair cell : plannedPath.subList(1, plannedPath.size())) {
+                for (Pair<Integer, Integer> cell : plannedPath.subList(1, plannedPath.size())) {
                     if (isCellLegalAndUnBlocked(cell, true)) {
                         cost += 1;
                         executedPath.add(cell);
                         LOG.debug("Moved to Cell : {}", cell);
+                        Main.grid.get(cell.getFirst()).get(cell.getSecond()).changeColor(Color.YELLOW);
+
                         currentNode = stateGridWorld.get(cell);
                         ;
                     } else {
@@ -177,7 +183,7 @@ public class RepeatedAStarSearch {
             expandedNodes += 1;
 
             closedList.add(currentNode.getXy());
-
+            Main.grid.get(currentNode.getXy().getFirst()).get(currentNode.getXy().getSecond()).changeColor(Color.GRAY);
             for (Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegalAndUnBlocked(neighbour, false)) {
 
@@ -203,6 +209,8 @@ public class RepeatedAStarSearch {
                         }
                         LOG.debug("Adding Neighbour to Open List : {}", neighbourNode);
                         openList.add(neighbourNode);
+                        Main.grid.get(neighbourNode.getXy().getFirst()).get(neighbourNode.getXy().getSecond()).changeColor(Color.GREEN);
+
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.rutgers.AI;
+package AI.Assignment1.UI;
 
 import AI.Assignment1.Algo.GridWorld;
 import javafx.application.Application;
@@ -6,12 +6,10 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -20,14 +18,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
-
-import static com.rutgers.AI.Test.INFINITY;
 
 public class Main  extends Application implements EventHandler {
 
@@ -41,7 +39,7 @@ public class Main  extends Application implements EventHandler {
     private static final int TILE_SIZE=10;
     private static final int CELLS=50;
     private static final int SIZE=CELLS*TILE_SIZE;
-    private List<List<Tile>> grid = new ArrayList<>();
+    public static List<List<Tile>> grid = new ArrayList<>();
 
     Pair<Integer, Integer> initialCell = Pair.of(0,0);
     Pair<Integer, Integer> goalCell = Pair.of(CELLS-1,CELLS-1);
@@ -209,7 +207,7 @@ public class Main  extends Application implements EventHandler {
                         Text text = grid.get(i).get(j).text;
                         int value=1;
                         if(!text.getText().isEmpty()){
-                           value=INFINITY;
+                           value= Test.INFINITY;
                         }
                         ((List)gridWorld.getGridWorld().get(i)).set(j,value);
                     });
@@ -350,7 +348,8 @@ public class Main  extends Application implements EventHandler {
         }
 
         public void changeColor(Paint color){
-            border.setFill(Color.AQUA);
+            if(text.textProperty().getValue().isEmpty())
+                border.setFill(color);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.rutgers.AI;
+package AI.Assignment1.UI;
 
 import AI.Assignment1.Algo.GridWorld;
 import AI.Assignment1.Algo.RepeatedAStarSearch;
@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
