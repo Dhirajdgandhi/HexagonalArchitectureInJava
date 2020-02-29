@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+@SpringBootApplication
 public class Main  extends Application implements EventHandler {
 
     public static void main(String[] args) {
@@ -36,10 +37,10 @@ public class Main  extends Application implements EventHandler {
     Stage window;
     Scene scene, scene2, scene3, scene4;
 
-    private static final int TILE_SIZE=10;
-    private static final int CELLS=50;
+    private static final int TILE_SIZE=40;
+    private static final int CELLS=10;
     private static final int SIZE=CELLS*TILE_SIZE;
-    public static List<List<Tile>> grid = new ArrayList<>();
+    public static List<List<Tile>> grid, gridForward, gridBackward, gridAdaptive = new ArrayList<>();
 
     Pair<Integer, Integer> initialCell = Pair.of(0,0);
     Pair<Integer, Integer> goalCell = Pair.of(CELLS-1,CELLS-1);
@@ -98,10 +99,11 @@ public class Main  extends Application implements EventHandler {
 //        border.setTop(hbox);
 //        border.setCenter(createMaze());
 
+        borderPane.setTop(null);
         borderPane.setCenter(createContent());
         borderPane.setBottom(hbox);
         borderPane.setRight(createVBox());
-        Scene scene = new Scene(borderPane, SIZE+300, SIZE+300);
+        Scene scene = new Scene(borderPane, SIZE+300, SIZE+100);
         return scene;
     }
 
@@ -140,7 +142,28 @@ public class Main  extends Application implements EventHandler {
             hBox.getChildren().addAll( blockingProbabilityText, autoGenerate);
         }
 
-        vBox.getChildren().addAll(hBox, resetButton);
+        Button button = new Button("Forward");
+        Button button1 = new Button("Backward");
+        Button button2 = new Button("Adaptive");
+        button.setOnAction(e->{
+            try {
+                Stage window1 = new Stage();
+//                BorderPane borderPane = new BorderPane();
+//                borderPane.setCenter(root);
+//                gridForward = createContent();
+                Scene scene = new Scene(new Pane(root), SIZE+100, SIZE+100);
+                window1.setScene(scene);
+                window1.show();
+
+                new Test().repeatedForwardAStarSearch(gridWorld);
+
+            } catch (CloneNotSupportedException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+
+        vBox.getChildren().addAll(hBox, resetButton, button, button1, button2);
 
         return vBox;
     }
@@ -292,9 +315,18 @@ public class Main  extends Application implements EventHandler {
     }
 
     private void initGrid(){
+
+//        if(grid!=null){
+//            IntStream.range(0, CELLS).forEach(i -> {
+//                IntStream.range(0, CELLS).forEach(j -> {
+//                    Tile tile = grid.get(i).get(j);
+//                    newRoot.getChildren().add(tile);
+//                });
+//            });
+//        }
+
         grid = new ArrayList<>();
 
-        // Deep Copy GridWorld to VisitedWorld
         IntStream.range(0, CELLS).forEach(i -> {
             grid.add(new ArrayList<>());
             IntStream.range(0, CELLS).forEach(j -> {
@@ -314,7 +346,7 @@ public class Main  extends Application implements EventHandler {
     public class Tile extends StackPane{
         private int x,y;
         private Rectangle border = new Rectangle(TILE_SIZE-2, TILE_SIZE-2);
-        private Text text = new Text();
+        public Text text = new Text();
 
         public Tile(int x, int y) {
             this.x = x;
@@ -348,8 +380,11 @@ public class Main  extends Application implements EventHandler {
         }
 
         public void changeColor(Paint color){
-            if(text.textProperty().getValue().isEmpty())
+            if(text.textProperty().getValue().isEmpty()){
+                border.setFill(null);
                 border.setFill(color);
+            }
+
         }
     }
 }

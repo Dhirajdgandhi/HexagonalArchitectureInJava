@@ -154,8 +154,13 @@ public class RepeatedAStarSearch {
         }
 
         LOG.info("Executed Path : {}", executedPath);
+        int executingStep = 1;
         for(Pair<Integer, Integer> cell : executedPath){
-            Main.grid.get(cell.getFirst()).get(cell.getSecond()).changeColor(Color.YELLOW);
+            Main.grid.get(cell.getSecond()).get(cell.getFirst()).changeColor(Color.YELLOW);
+            String prevText = Main.grid.get(cell.getSecond()).get(cell.getFirst()).text.getText();
+            Main.grid.get(cell.getSecond()).get(cell.getFirst()).text.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
+            Main.grid.get(cell.getSecond()).get(cell.getFirst()).text.setFill(Color.BLACK);
+            executingStep+=1;
         }
         return cost;
     }

@@ -76,17 +76,17 @@ public class Test {
         endTimer();
         LOG.info("The Repeated AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, forwardCost, repeatedForwardAStarSearch.getExpandedNodes());
 
-        RepeatedAStarSearch repeatedBackwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
-        startTimer();
-        int backwardCost = repeatedBackwardAStarSearch.search(true, false);
-        endTimer();
-        LOG.info("The Repeated AStar Backward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, backwardCost, repeatedBackwardAStarSearch.getExpandedNodes());
-
-        RepeatedAStarSearch repeatedForwardAdaptiveAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
-        startTimer();
-        int adaptiveForwardCost = repeatedForwardAdaptiveAStarSearch.search(false, true);
-        endTimer();
-        LOG.info("The Repeated Adaptive AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, adaptiveForwardCost, repeatedForwardAdaptiveAStarSearch.getExpandedNodes());
+//        RepeatedAStarSearch repeatedBackwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
+//        startTimer();
+//        int backwardCost = repeatedBackwardAStarSearch.search(true, false);
+//        endTimer();
+//        LOG.info("The Repeated AStar Backward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, backwardCost, repeatedBackwardAStarSearch.getExpandedNodes());
+//
+//        RepeatedAStarSearch repeatedForwardAdaptiveAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
+//        startTimer();
+//        int adaptiveForwardCost = repeatedForwardAdaptiveAStarSearch.search(false, true);
+//        endTimer();
+//        LOG.info("The Repeated Adaptive AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", (endTime - startTime) / 1000, adaptiveForwardCost, repeatedForwardAdaptiveAStarSearch.getExpandedNodes());
 
 //        if(forwardCost==-1) return repeatedForwardAStarSearch();
 //        else return forwardCost;

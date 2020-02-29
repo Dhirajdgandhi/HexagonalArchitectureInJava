@@ -20,7 +20,7 @@ public class TestApplicationRepeatedAStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestApplicationRepeatedAStar.class.getName());
 
-    static final int INFINITY = 1000;
+    static final int INFINITY = 999999999;
     long startTime, endTime;
 
     public void startTimer() {
@@ -28,6 +28,7 @@ public class TestApplicationRepeatedAStar {
     }
 
     public void endTimer() {
+
         endTime = System.nanoTime();
     }
 
