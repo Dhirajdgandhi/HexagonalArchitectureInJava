@@ -10,7 +10,7 @@
 
     <groupId>com.spring</groupId>
     <artifactId>projects</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>projects</name>
     <description>Projects</description>
     <packaging>pom</packaging>

@@ -1,7 +1,6 @@
 package com.rutgers.AI;
 
 import AI.Assignment1.Algo.GridWorld;
-import com.sun.deploy.panel.TextFieldProperty;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -15,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,6 +24,7 @@ import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 import static com.rutgers.AI.Test.INFINITY;
@@ -37,16 +38,19 @@ public class Main  extends Application implements EventHandler {
     Stage window;
     Scene scene, scene2, scene3, scene4;
 
-
     private static final int TILE_SIZE=50;
     private static final int CELLS=5;
     private static final int SIZE=CELLS*TILE_SIZE;
+    private List<List<Tile>> grid = new ArrayList<>();
+
+    Pair initialCell = Pair.of(0,0);
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         window = primaryStage;
         window.setTitle("AI Assignment 1");
-        window.setResizable(false);
+        window.setResizable(true);
         HBox hBox = new HBox();
         {
             hBox.setStyle("-fx-background-color: #991f23;");
@@ -70,7 +74,7 @@ public class Main  extends Application implements EventHandler {
                 window.setScene(getSecondScene());
             });
             vBox.getChildren().addAll(label, button);
-            vBox.setSpacing(50);
+            vBox.setSpacing(5);
             vBox.setAlignment(Pos.CENTER);
         }
 
@@ -85,8 +89,9 @@ public class Main  extends Application implements EventHandler {
         window.show();
     }
 
+    private BorderPane borderPane = new BorderPane();
+
     public Scene getSecondScene(){
-        BorderPane border = new BorderPane();
         HBox hbox = addHBox("Repeated AStar Search");
         hbox.setPadding(new Insets(15, 12, 15, 12));
         hbox.setSpacing(10);
@@ -95,12 +100,64 @@ public class Main  extends Application implements EventHandler {
 //        border.setTop(hbox);
 //        border.setCenter(createMaze());
 
-        border.setTop(createContent());
-        border.setBottom(hbox);
-        Scene scene = new Scene(border, SIZE+100, SIZE+100);
+        borderPane.setCenter(createContent());
+        borderPane.setBottom(hbox);
+        borderPane.setRight(createVBox());
+        Scene scene = new Scene(borderPane, SIZE+300, SIZE+300);
         return scene;
     }
 
+    private VBox createVBox(){
+        VBox vBox = new VBox();
+        {
+            vBox.setPadding(new Insets(15, 12, 15, 12));
+            vBox.setSpacing(10);
+            vBox.setStyle("-fx-background-color: #991f23;");
+        }
+
+        Button resetButton = new Button("Reset");
+        {
+            resetButton.setOnAction(e->{
+                grid = new ArrayList<>();
+                borderPane.setTop(createContent());
+            });
+        }
+
+        TextField blockingProbabilityText = new TextField("0.3");
+        blockingProbabilityText.setPrefWidth(40);
+        Button autoGenerate = new Button(" Auto Generate");
+        {
+            autoGenerate.setOnAction(e->{
+                // Generate Maze with given blocking probability
+                double blockingProbabilityValue = Double.valueOf(blockingProbabilityText.getText());
+                autoGenerate(blockingProbabilityValue);
+            });
+        }
+
+        HBox hBox = new HBox();
+        {
+            hBox.setPadding(new Insets(15, 12, 15, 12));
+            hBox.setSpacing(20);
+            hBox.setStyle("-fx-background-color: #991f23;");
+            hBox.getChildren().addAll( blockingProbabilityText, autoGenerate);
+        }
+
+        vBox.getChildren().addAll(hBox, resetButton);
+
+        return vBox;
+    }
+
+    private void autoGenerate(double blockingProbabilityValue){
+        IntStream.range(0, CELLS).forEach(i -> {
+            IntStream.range(0, CELLS).forEach(j -> {
+                Random r = new Random();
+                int randomResult = r.nextInt(100);
+                if (randomResult <= (int)(blockingProbabilityValue*100)) {
+                    grid.get(i).get(j).block();
+                }
+            });
+        });
+    }
 //    private GridPane createMaze(){
 //        int rows = CELLS;
 //        int columns = CELLS;
@@ -142,7 +199,6 @@ public class Main  extends Application implements EventHandler {
         hbox.setStyle("-fx-background-color: #991f23;");
 
         Button startButton = new Button("Start");
-
         startButton.setOnAction(e-> {
             gridWorld = new GridWorld(1,grid.size(),grid.size());
 //            new Test().run();
@@ -228,13 +284,17 @@ public class Main  extends Application implements EventHandler {
 
     }
 
-    private List<List<Tile>> grid = new ArrayList<>();
+    private Pane root;
 
     private Pane createContent(){
-        Pane root = new Pane();
+        root = new Pane();
         root.setPrefSize(SIZE,SIZE);
 //        root.setStyle("-fx-background-color: rgba(0,0,0,0.99);");
+        initGrid();
+        return root;
+    }
 
+    private void initGrid(){
         grid = new ArrayList<>();
 
         // Deep Copy GridWorld to VisitedWorld
@@ -246,11 +306,14 @@ public class Main  extends Application implements EventHandler {
                 root.getChildren().add(tile);
             });
         });
-
-        return root;
+        grid.get(0).get(0).border.setFill(Color.BLUE);
+        grid.get(4).get(4).border.setFill(Color.RED);
     }
 
-    private class Tile extends StackPane{
+
+
+
+    public class Tile extends StackPane{
         private int x,y;
         private Rectangle border = new Rectangle(TILE_SIZE-2, TILE_SIZE-2);
         private Text text = new Text();
@@ -269,7 +332,7 @@ public class Main  extends Application implements EventHandler {
             setOnMouseClicked(e -> block());
         }
 
-        private void block(){
+        public void block(){
             if(text.getText().isEmpty()){
                 text = new Text();
                 text.setText("X");
@@ -278,5 +341,8 @@ public class Main  extends Application implements EventHandler {
             }
         }
 
+        public void changeColor(Paint color){
+            border.setFill(Color.AQUA);
+        }
     }
 }
