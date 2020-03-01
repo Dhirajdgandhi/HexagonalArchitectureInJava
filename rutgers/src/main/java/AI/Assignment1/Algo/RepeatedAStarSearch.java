@@ -222,7 +222,6 @@ public class RepeatedAStarSearch{
                         LOG.debug("Adding Neighbour to Open List : {}", neighbourNode);
                         openList.add(neighbourNode);
                         MainScreen.getCurrentGrid().get(neighbourNode.getXy().getX()).get(neighbourNode.getXy().getY()).changeColor(Color.GREEN);
-
                     }
                 }
             }

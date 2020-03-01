@@ -1,8 +1,8 @@
 package AI.Assignment1.UI;
 
 import AI.Assignment1.Algo.GridWorld;
+import AI.Assignment1.Entity.Output;
 import AI.Assignment1.Entity.XY;
-import AI.Assignment1.UIApp;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,9 +19,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class MainScreen extends Application {
     Scene mainScene, secondScene, forwardScene, backwardScene, adaptiveScene;
 
     private static final int TILE_SIZE = 40;
-    private static final int CELLS = 10;
+    private static final int CELLS = 5;
     private static final int SIZE = CELLS * TILE_SIZE;
 
     // Independent Grids for all possible searches
@@ -59,7 +59,17 @@ public class MainScreen extends Application {
     private Pane adaptiveGridPane;
     private ComboBox<String> comboBox = new ComboBox<>();
     private Test test;
-    private int fCost, bCost, aCost;
+    Text fCost = new Text();
+    Text bCost = new Text();
+    Text aCost = new Text();
+
+    Text fRunTime = new Text();
+    Text bRunTime = new Text();
+    Text aRunTime = new Text();
+
+    Text fExpandedNodes = new Text();
+    Text bExpandedNodes = new Text();
+    Text aExpandedNodes = new Text();
 
     public static void main(String[] args) {
         SpringApplication.run(MainScreen.class);
@@ -129,16 +139,7 @@ public class MainScreen extends Application {
             rootGridPane = new Pane();
             rootGridPane.setPrefSize(SIZE, SIZE);
 
-            forwardGridPane = new Pane();
-            forwardGridPane.setPrefSize(SIZE, SIZE);
-
-            backwardGridPane = new Pane();
-            backwardGridPane.setPrefSize(SIZE, SIZE);
-
-            adaptiveGridPane = new Pane();
-            adaptiveGridPane.setPrefSize(SIZE, SIZE);
-
-            initGrid();
+            initMainGrid();
         }
 
         {
@@ -182,7 +183,7 @@ public class MainScreen extends Application {
             comboBox.getItems().addAll(
                     FORWARD, BACKWARD, ADAPTIVE
             );
-            comboBox.getSelectionModel().selectFirst();
+            comboBox.getSelectionModel().select(0);
         }
 
         vBox.getChildren().addAll(hBox, comboBox);
@@ -213,10 +214,7 @@ public class MainScreen extends Application {
         Button startButton = new Button("Start");
         {
             startButton.setOnAction(e -> {
-                // Before search save the gridWorld
-//                GridWorld gridWorld = createGridWorldUsingTileGrid();
-                //create the dropdown selected screen and open up
-                setupScreenForSelectedDropDownValue(comboBox.getValue());
+                setupScreenForSelectedDropDownValue();
             });
             startButton.setPrefSize(100, 20);
         }
@@ -226,6 +224,7 @@ public class MainScreen extends Application {
             resetButton.setOnAction(e -> {
                 reinitializeUnBlockedGrid();
                 // Close All search windows if open
+
                 borderPane.setCenter(rootGridPane);
             });
             resetButton.setPrefSize(100, 20);
@@ -257,12 +256,32 @@ public class MainScreen extends Application {
 
                 // On Search Button -
                 try {
-                    fCost = test.repeatedForwardAStarSearch(gridWorld);
+                    switch (titleString) {
+                        case FORWARD: {
+                            Output output = test.repeatedForwardAStarSearch(initialCell, goalCell, gridWorld);
+                            fCost.textProperty().setValue(String.valueOf(output.getCost()));
+                            fExpandedNodes.textProperty().setValue(String.valueOf(output.getExpandedNodes()));
+                            fRunTime.textProperty().setValue(String.valueOf(output.getRuntime()));
+                            break;
+                        }
+                        case BACKWARD: {
+                            Output output = test.repeatedBackwardAStarSearch(initialCell, goalCell, gridWorld);
+                            bCost.textProperty().setValue(String.valueOf(output.getCost()));
+                            bExpandedNodes.textProperty().setValue(String.valueOf(output.getExpandedNodes()));
+                            bRunTime.textProperty().setValue(String.valueOf(output.getRuntime()));
+                            break;
+                        }
+                        case ADAPTIVE: {
+                            Output output = test.repeatedAdaptiveAStarSearch(initialCell, goalCell, gridWorld);
+                            aCost.textProperty().setValue(String.valueOf(output.getCost()));
+                            aExpandedNodes.textProperty().setValue(String.valueOf(output.getExpandedNodes()));
+                            aRunTime.textProperty().setValue(String.valueOf(output.getRuntime()));
+                            break;
+                        }
+                    }
                 } catch (CloneNotSupportedException ex) {
                     ex.printStackTrace();
                 }
-
-//                setupScreenForSelectedDropDownValue(gridWorld, titleString);
             });
             startButton.setPrefSize(100, 20);
         }
@@ -276,20 +295,33 @@ public class MainScreen extends Application {
         return hbox;
     }
 
-    private void setupScreenForSelectedDropDownValue(String type) {
-        switch (type) {
+    private void setupScreenForSelectedDropDownValue() {
+
+        switch (comboBox.getValue()) {
             case FORWARD: {
+                if(forwardWindow!=null) forwardWindow.close();
+
                 gridForward = new ArrayList<>();
+                forwardGridPane = new Pane();
+                forwardGridPane.setPrefSize(SIZE, SIZE);
+
 
                 IntStream.range(0, CELLS).forEach(i -> {
                     gridForward.add(new ArrayList<>());
                     IntStream.range(0, CELLS).forEach(j -> {
-                        Tile tile = null;
-                        try {
-                            tile = (Tile)mainGrid.get(i).get(j).clone();
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                        }
+                        Tile tile = new Tile(j, i), oldTile;
+
+                        oldTile = mainGrid.get(i).get(j);
+
+                        Text oldText = oldTile.getText();
+                        Text newText = new Text();
+                        newText.setText(oldText.getText());
+
+                        Rectangle oldBorder = oldTile.border;
+
+                        oldTile.text = newText;
+                        tile.border.setFill(oldBorder.getFill());
+                        tile.border.setStroke(oldBorder.getStroke());
                         gridForward.get(i).add(tile);
                         forwardGridPane.getChildren().add(tile);
                     });
@@ -303,17 +335,29 @@ public class MainScreen extends Application {
                 break;
             }
             case BACKWARD: {
+                if (backwardWindow!=null) backwardWindow.close();
                 gridBackward = new ArrayList<>();
+
+                backwardGridPane = new Pane();
+                backwardGridPane.setPrefSize(SIZE, SIZE);
 
                 IntStream.range(0, CELLS).forEach(i -> {
                     gridBackward.add(new ArrayList<>());
                     IntStream.range(0, CELLS).forEach(j -> {
-                        Tile tile = null;
-                        try {
-                            tile = (Tile)mainGrid.get(i).get(j).clone();
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                        }
+                        Tile tile = new Tile(j, i), oldTile;
+
+                        oldTile = mainGrid.get(i).get(j);
+
+                        Text oldText = oldTile.getText();
+                        Text newText = new Text();
+                        newText.setText(oldText.getText());
+
+                        Rectangle oldBorder = oldTile.border;
+
+                        oldTile.text = newText;
+                        tile.border.setFill(oldBorder.getFill());
+                        tile.border.setStroke(oldBorder.getStroke());
+
                         gridBackward.get(i).add(tile);
                         backwardGridPane.getChildren().add(tile);
                     });
@@ -322,22 +366,35 @@ public class MainScreen extends Application {
 
                 backwardWindow = new Stage();
                 backwardScene = createSearchScreen(BACKWARD, backwardGridPane);
-                backwardWindow.setScene(forwardScene);
+                backwardWindow.setScene(backwardScene);
                 backwardWindow.show();
                 break;
             }
             case ADAPTIVE: {
+                if (adaptiveWindow!=null) adaptiveWindow.close();
+
+                adaptiveGridPane = new Pane();
+                adaptiveGridPane.setPrefSize(SIZE, SIZE);
+
                 gridAdaptive = new ArrayList<>();
 
                 IntStream.range(0, CELLS).forEach(i -> {
                     gridAdaptive.add(new ArrayList<>());
                     IntStream.range(0, CELLS).forEach(j -> {
-                        Tile tile = null;
-                        try {
-                            tile = (Tile)mainGrid.get(i).get(j).clone();
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                        }
+                        Tile tile = new Tile(j, i), oldTile;
+
+                        oldTile = mainGrid.get(i).get(j);
+
+                        Text oldText = oldTile.getText();
+                        Text newText = new Text();
+                        newText.setText(oldText.getText());
+
+                        Rectangle oldBorder = oldTile.border;
+
+                        oldTile.text = newText;
+                        tile.border.setFill(oldBorder.getFill());
+                        tile.border.setStroke(oldBorder.getStroke());
+
                         gridAdaptive.get(i).add(tile);
                         adaptiveGridPane.getChildren().add(tile);
                     });
@@ -345,7 +402,7 @@ public class MainScreen extends Application {
                 currentGrid = gridAdaptive;
 
                 adaptiveWindow = new Stage();
-                adaptiveScene = createSearchScreen(BACKWARD, adaptiveGridPane);
+                adaptiveScene = createSearchScreen(ADAPTIVE, adaptiveGridPane);
                 adaptiveWindow.setScene(adaptiveScene);
                 adaptiveWindow.show();
                 break;
@@ -372,16 +429,63 @@ public class MainScreen extends Application {
             vBox.setSpacing(10);
             vBox.setStyle("-fx-background-color: #991f23;");
 
-            Text cost = new Text("Cost:" + "0");
-            cost.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+            Text cost = new Text();
+            Text expandedNodes = new Text();
+            Text runtime = new Text();
 
-            Text expandedNodes = new Text("Expanded Nodes:" + "0");
-            expandedNodes.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+            if(titleString.equals(FORWARD)){
+                cost.textProperty().bindBidirectional(fCost.textProperty());
+                expandedNodes.textProperty().bindBidirectional(fExpandedNodes.textProperty());
+                runtime.textProperty().bindBidirectional(fRunTime.textProperty());
+            } else  if(titleString.equals(BACKWARD)){
+                cost.textProperty().bindBidirectional(bCost.textProperty());
+                expandedNodes.textProperty().bindBidirectional(bExpandedNodes.textProperty());
+                runtime.textProperty().bindBidirectional(bRunTime.textProperty());
+            } else  if(titleString.equals(ADAPTIVE)){
+                cost.textProperty().bindBidirectional(aCost.textProperty());
+                expandedNodes.textProperty().bindBidirectional(aExpandedNodes.textProperty());
+                runtime.textProperty().bindBidirectional(aRunTime.textProperty());
+            }
 
-            Text runtime = new Text("Run Time: " + "0");
-            runtime.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
-            vBox.getChildren().addAll(cost, expandedNodes, runtime);
+            HBox hBox1 = new HBox();
+            {
+                hBox1.setPadding(new Insets(15, 12, 15, 12));
+                hBox1.setSpacing(5);
+                hBox1.setStyle("-fx-background-color: #991f23;");
+
+                cost.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                Label label = new Label("Cost : ");
+                label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                hBox1.getChildren().addAll(label,cost);
+            }
+
+            HBox hBox2 = new HBox();
+            {
+                hBox2.setPadding(new Insets(15, 12, 15, 12));
+                hBox2.setSpacing(5);
+                hBox2.setStyle("-fx-background-color: #991f23;");
+
+                expandedNodes.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                Label label = new Label("Expanded Nodes : ");
+                label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                hBox2.getChildren().addAll(label,expandedNodes);
+            }
+
+            HBox hBox3 = new HBox();
+            {
+                hBox3.setPadding(new Insets(15, 12, 15, 12));
+                hBox3.setSpacing(5);
+                hBox3.setStyle("-fx-background-color: #991f23;");
+
+                runtime.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                Label label = new Label("RunTime : ");
+                label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+                hBox3.getChildren().addAll(label,runtime);
+            }
+
+
+            vBox.getChildren().addAll(hBox1, hBox2, hBox3, runtime);
         }
 
         {
@@ -412,10 +516,12 @@ public class MainScreen extends Application {
     }
 
     private void reinitializeUnBlockedGrid() {
-        initGrid();
+        rootGridPane = new Pane();
+        rootGridPane.setPrefSize(SIZE, SIZE);
+        initMainGrid();
     }
 
-    private void initGrid() {
+    private void initMainGrid() {
 
         mainGrid = new ArrayList<>();
 
@@ -433,22 +539,11 @@ public class MainScreen extends Application {
 
     private void setInitAndGoalCell() {
         mainGrid.get(initialCell.getX()).get(initialCell.getY()).border.setFill(Color.AQUA);
-//        gridForward.get(initialCell.getX()).get(initialCell.getY()).border.setFill(Color.AQUA);
-//        gridBackward.get(initialCell.getX()).get(initialCell.getY()).border.setFill(Color.AQUA);
-//        gridAdaptive.get(initialCell.getX()).get(initialCell.getY()).border.setFill(Color.AQUA);
-
         mainGrid.get(goalCell.getX()).get(goalCell.getY()).border.setFill(Color.RED);
-//        gridForward.get(goalCell.getX()).get(goalCell.getY()).border.setFill(Color.RED);
-//        gridBackward.get(goalCell.getX()).get(goalCell.getY()).border.setFill(Color.RED);
-//        gridAdaptive.get(goalCell.getX()).get(goalCell.getY()).border.setFill(Color.RED);
     }
 
     public static List<List<Tile>> getCurrentGrid() {
         return currentGrid;
-    }
-
-    public static void setCurrentGrid(List<List<Tile>> currentGrid) {
-        MainScreen.currentGrid = currentGrid;
     }
 
     public class Tile extends StackPane implements Cloneable {
@@ -479,7 +574,7 @@ public class MainScreen extends Application {
         }
 
         public void flip() {
-            if (text.getText().isEmpty()) {
+            if (!isBlocked()) {
                 block();
             } else {
                 text.setText(null);
@@ -488,11 +583,19 @@ public class MainScreen extends Application {
         }
 
         public void changeColor(Paint color) {
-            if (text.textProperty().getValue().isEmpty()) {
+            if (!isBlocked() && !isInitOrGoalCell()) {
                 border.setFill(null);
                 border.setFill(color);
             }
+        }
 
+        private boolean isInitOrGoalCell(){
+            return initialCell.equals(new XY(x, y))
+            || goalCell.equals(new XY(x, y));
+        }
+
+        public boolean isBlocked(){
+            return !text.getText().isEmpty();
         }
 
         public Text getText() {
@@ -503,10 +606,5 @@ public class MainScreen extends Application {
             this.text = text;
         }
 
-        public Object clone() throws
-                CloneNotSupportedException
-        {
-            return super.clone();
-        }
     }
 }
