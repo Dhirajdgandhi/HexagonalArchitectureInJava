@@ -19,7 +19,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -381,7 +380,7 @@ public class MainScreen extends Application {
                 IntStream.range(0, CELLS).forEach(i -> {
                     gridAdaptive.add(new ArrayList<>());
                     IntStream.range(0, CELLS).forEach(j -> {
-                        Tile tile = new Tile(j, i), oldTile;
+                        Tile tile = new Tile(i, j), oldTile;
 
                         oldTile = mainGrid.get(i).get(j);
 
@@ -502,8 +501,8 @@ public class MainScreen extends Application {
     private GridWorld createGridWorldUsingTileGrid() {
         GridWorld gridWorld = new GridWorld(1, mainGrid.size(), mainGrid.size());
 
-        IntStream.range(0, mainGrid.size()).forEach(i -> {
-            IntStream.range(0, mainGrid.size()).forEach(j -> {
+        IntStream.range(0, CELLS).forEach(i -> {
+            IntStream.range(0, CELLS).forEach(j -> {
                 Text text = mainGrid.get(i).get(j).getText();
                 int value = 1;
                 if (!text.getText().isEmpty()) {
@@ -529,7 +528,7 @@ public class MainScreen extends Application {
             mainGrid.add(new ArrayList<>());
 
             IntStream.range(0, CELLS).forEach(j -> {
-                Tile tile1 = new Tile(j, i);
+                Tile tile1 = new Tile(i, j);
                 mainGrid.get(i).add(tile1);
                 rootGridPane.getChildren().add(tile1);
             });

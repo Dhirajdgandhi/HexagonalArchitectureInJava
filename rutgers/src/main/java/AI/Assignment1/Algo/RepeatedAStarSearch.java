@@ -195,7 +195,9 @@ public class RepeatedAStarSearch{
             expandedNodes += 1;
 
             closedList.add(currentNode.getXy());
-            MainScreen.getCurrentGrid().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GRAY);
+            if(gridWorld.getGridWorld().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()) != BLOCKED_CELL){
+                MainScreen.getCurrentGrid().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GRAY);
+            }
             for (XY neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegalAndUnBlocked(neighbour, false)) {
 
@@ -221,7 +223,9 @@ public class RepeatedAStarSearch{
                         }
                         LOG.debug("Adding Neighbour to Open List : {}", neighbourNode);
                         openList.add(neighbourNode);
-                        MainScreen.getCurrentGrid().get(neighbourNode.getXy().getX()).get(neighbourNode.getXy().getY()).changeColor(Color.GREEN);
+                        if(gridWorld.getGridWorld().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()) != BLOCKED_CELL){
+                            MainScreen.getCurrentGrid().get(neighbourNode.getXy().getX()).get(neighbourNode.getXy().getY()).changeColor(Color.GREEN);
+                        }
                     }
                 }
             }
