@@ -1,4 +1,4 @@
-package Assignment1.Nodes;
+package AI.Assignment1.Entity;
 
 import org.springframework.data.util.Pair;
 

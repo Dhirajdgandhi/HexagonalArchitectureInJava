@@ -2,27 +2,26 @@ package AI.Assignment1.Algo;
 
 //import com.spring.boot.PriorityQueue;
 
-import AI.Assignment1.UI.Main;
-import Assignment1.Nodes.BlockNode;
-import Assignment1.Nodes.NodeBase;
+import AI.Assignment1.UI.MainScreen;
+import AI.Assignment1.Entity.BlockNode;
+import AI.Assignment1.Entity.NodeBase;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 
 import java.util.*;
 
+import static AI.Assignment1.Utility.Constants.Constant.*;
 import static com.spring.boot.MathsCalc.calculateManhattanDistance;
 
 public class RepeatedAStarSearch {
 
     private static final Logger LOG = LoggerFactory.getLogger(RepeatedAStarSearch.class.getName());
-
-
-    static int MIN_X, MIN_Y = 0;
-    static final int INFINITY = 999999999;
-    static final int BLOCKED_CELL = INFINITY;
+//
+//    static int MIN_X, MIN_Y = 0;
+//    static final int INFINITY = 999999999;
+//    static final int BLOCKED_CELL = INFINITY;
     private int MAX_X, MAX_Y;
 
     private GridWorld<Integer> gridWorld;
@@ -156,10 +155,10 @@ public class RepeatedAStarSearch {
         LOG.info("Executed Path : {}", executedPath);
         int executingStep = 1;
         for(Pair<Integer, Integer> cell : executedPath){
-            Main.grid.get(cell.getSecond()).get(cell.getFirst()).changeColor(Color.YELLOW);
-            String prevText = Main.grid.get(cell.getSecond()).get(cell.getFirst()).text.getText();
-            Main.grid.get(cell.getSecond()).get(cell.getFirst()).text.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
-            Main.grid.get(cell.getSecond()).get(cell.getFirst()).text.setFill(Color.BLACK);
+            MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).changeColor(Color.YELLOW);
+            String prevText = MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).text.getText();
+            MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).text.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
+            MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).text.setFill(Color.BLACK);
             executingStep+=1;
         }
         return cost;
@@ -189,7 +188,7 @@ public class RepeatedAStarSearch {
             expandedNodes += 1;
 
             closedList.add(currentNode.getXy());
-            Main.grid.get(currentNode.getXy().getFirst()).get(currentNode.getXy().getSecond()).changeColor(Color.GRAY);
+            MainScreen.grid.get(currentNode.getXy().getFirst()).get(currentNode.getXy().getSecond()).changeColor(Color.GRAY);
             for (Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegalAndUnBlocked(neighbour, false)) {
 
@@ -215,7 +214,7 @@ public class RepeatedAStarSearch {
                         }
                         LOG.debug("Adding Neighbour to Open List : {}", neighbourNode);
                         openList.add(neighbourNode);
-                        Main.grid.get(neighbourNode.getXy().getFirst()).get(neighbourNode.getXy().getSecond()).changeColor(Color.GREEN);
+                        MainScreen.grid.get(neighbourNode.getXy().getFirst()).get(neighbourNode.getXy().getSecond()).changeColor(Color.GREEN);
 
                     }
                 }

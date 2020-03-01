@@ -2,9 +2,7 @@ package AI.Assignment1.Algo;
 
 import org.springframework.data.util.Pair;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -15,9 +13,11 @@ public class GridWorld<T> {
     public GridWorld() {
     }
 
+    /** Initialize GridWorld with
+     * @param value for all cells
+     * */
     public GridWorld(T value, int row, int col) {
         this.gridWorld = new ArrayList<>();
-        // Deep Copy GridWorld to VisitedWorld
         IntStream.range(0, row).forEach(i -> {
             this.gridWorld.add(new ArrayList<>());
             IntStream.range(0, col).forEach(j -> {
@@ -26,42 +26,26 @@ public class GridWorld<T> {
         });
     }
 
-    public GridWorld(List<List<T>> gridWorld) {
-        this.gridWorld = gridWorld;
-    }
-
-    public GridWorld(GridWorld<T> gridWorld) {
-        this.gridWorld = new ArrayList<>();
-        // Deep Copy GridWorld to VisitedWorld
-        for (List sublist : gridWorld.getGridWorld()) {
-            this.gridWorld.add(new ArrayList(sublist));
-        }
-    }
-
-    public List<List<T>> getGridWorld() {
-        return gridWorld;
-    }
-
+    /** Utility to fetch value using
+     * @param xy Coordinates
+     * */
     public T get(Pair<Integer, Integer> xy) {
         int row = xy.getSecond();
         int col = xy.getFirst();
         return gridWorld.get(row).get(col);
     }
 
+    /** Utility to set value using
+     * @param xy Coordinates
+     * */
     public void set(Pair<Integer, Integer> xy, T value) {
         int row = xy.getSecond();
         int col = xy.getFirst();
         gridWorld.get(row).set(col, value);
     }
 
-    public int rowSize() {
-        return this.gridWorld != null ? this.gridWorld.size() : -1;
-    }
-
-    public int colSize() {
-        return this.gridWorld != null ? this.gridWorld.get(0).size() : -1;
-    }
-
+    /** Print GridWorld on terminal
+     * */
     public void printGridWorldState() {
         final Integer[] rowList = {null}; //Dummy list
 
@@ -82,23 +66,33 @@ public class GridWorld<T> {
         }
     }
 
+    /** Generates a Grid world with blocked nodes having value
+     * @param INFINITY
+     * */
     public void generateMaze(T INFINITY) {
 
-        // Deep Copy GridWorld to VisitedWorld
+        int blockedProbability = 30;
         IntStream.range(0, rowSize()).forEach(i -> {
             IntStream.range(0, colSize()).forEach(j -> {
-
-                // 30% - Block
-                // 70% - Free
-
                 Random r = new Random();
                 int randomResult = r.nextInt(100);
-                if (randomResult <= 0) {
+                if (randomResult <= blockedProbability) {
                     this.gridWorld.get(i).set(j, INFINITY);
                 }
             });
         });
     }
 
+    public List<List<T>> getGridWorld() {
+        return gridWorld;
+    }
+
+    public int rowSize() {
+        return this.gridWorld != null ? this.gridWorld.size() : -1;
+    }
+
+    public int colSize() {
+        return this.gridWorld != null ? this.gridWorld.get(0).size() : -1;
+    }
 
 }

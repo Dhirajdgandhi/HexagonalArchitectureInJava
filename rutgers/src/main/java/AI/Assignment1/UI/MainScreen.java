@@ -28,11 +28,7 @@ import java.util.Random;
 import java.util.stream.IntStream;
 
 @SpringBootApplication
-public class Main  extends Application implements EventHandler {
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+public class MainScreen extends Application implements EventHandler {
 
     Stage window;
     Scene scene, scene2, scene3, scene4;
@@ -40,10 +36,17 @@ public class Main  extends Application implements EventHandler {
     private static final int TILE_SIZE=40;
     private static final int CELLS=10;
     private static final int SIZE=CELLS*TILE_SIZE;
+
+    // Independent Grids for all possible searches
     public static List<List<Tile>> grid, gridForward, gridBackward, gridAdaptive = new ArrayList<>();
 
+    // Default Initial and Goal
     Pair<Integer, Integer> initialCell = Pair.of(0,0);
     Pair<Integer, Integer> goalCell = Pair.of(CELLS-1,CELLS-1);
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {

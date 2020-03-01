@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static AI.Assignment1.Utility.Constants.Constant.INFINITY;
+
 public class Test {
 
     private static final Logger LOG = LoggerFactory.getLogger(Test.class.getName());
 
-    static final int INFINITY = 999999999;
     long startTime, endTime;
 
     public void startTimer() {
