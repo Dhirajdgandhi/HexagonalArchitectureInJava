@@ -70,8 +70,6 @@ public class RepeatedAStarSearch{
      * @param adaptive   True for adaptive search
      */
     public int search(boolean isBackward, boolean adaptive) throws CloneNotSupportedException {
-        WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
-
         List<XY> executedPath = new ArrayList();
 
         NodeBase goalNode = stateGridWorld.get(goalCell);

@@ -35,8 +35,8 @@ public class MainScreen extends Application {
     Stage window, forwardWindow, backwardWindow, adaptiveWindow;
     Scene mainScene, secondScene, forwardScene, backwardScene, adaptiveScene;
 
-    private static final int TILE_SIZE = 40;
-    private static final int CELLS = 5;
+    private static final int TILE_SIZE = 10;
+    private static final int CELLS = 100;
     private static final int SIZE = CELLS * TILE_SIZE;
 
     // Independent Grids for all possible searches
@@ -80,7 +80,7 @@ public class MainScreen extends Application {
         test = new Test();
         window = primaryStage;
         window.setTitle("AI Assignment 1");
-        window.setResizable(false);
+        window.setResizable(true);
         createMainScene();
         window.setScene(mainScene);
         window.show();
@@ -308,7 +308,7 @@ public class MainScreen extends Application {
                 IntStream.range(0, CELLS).forEach(i -> {
                     gridForward.add(new ArrayList<>());
                     IntStream.range(0, CELLS).forEach(j -> {
-                        Tile tile = new Tile(j, i), oldTile;
+                        Tile tile = new Tile(i, j), oldTile;
 
                         oldTile = mainGrid.get(i).get(j);
 
@@ -343,7 +343,7 @@ public class MainScreen extends Application {
                 IntStream.range(0, CELLS).forEach(i -> {
                     gridBackward.add(new ArrayList<>());
                     IntStream.range(0, CELLS).forEach(j -> {
-                        Tile tile = new Tile(j, i), oldTile;
+                        Tile tile = new Tile(i, j), oldTile;
 
                         oldTile = mainGrid.get(i).get(j);
 
