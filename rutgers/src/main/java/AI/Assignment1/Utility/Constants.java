@@ -5,5 +5,8 @@ public class Constants {
         public static final int INFINITY = 999999999;
         public static final int BLOCKED_CELL = INFINITY;
         public static int MIN_X, MIN_Y = 0;
+        public static final String FORWARD = "Forward";
+        public static final String BACKWARD = "Backward";
+        public static final String ADAPTIVE = "Adaptive";
     }
 }

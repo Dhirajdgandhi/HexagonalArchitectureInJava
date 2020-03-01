@@ -6,6 +6,7 @@ import AI.Assignment1.Entity.XY;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +17,11 @@ import static AI.Assignment1.Utility.Constants.Constant.INFINITY;
 public class Test {
 
     private static final Logger LOG = LoggerFactory.getLogger(Test.class.getName());
-
     long startTime, endTime;
 
     public void startTimer() {
         startTime = System.nanoTime();
     }
-
     public void endTimer() {
         endTime = System.nanoTime();
     }
@@ -59,6 +58,14 @@ public class Test {
         LOG.info("{} X {} Maze Generation Took : {} microsecs to be generated", MAX_ROW, MAX_COL, (endTime - startTime) / 1000);
 
         return repeatedForwardAStarSearch(gridWorld);
+    }
+
+    public int repeatedBackwardAStarSearch(GridWorld gridWorld){
+        return 0;
+    }
+
+    public int repeatedAdaptiveAStarSearch(GridWorld gridWorld){
+        return 0;
     }
 
     public int repeatedForwardAStarSearch(GridWorld gridWorld) throws CloneNotSupportedException {

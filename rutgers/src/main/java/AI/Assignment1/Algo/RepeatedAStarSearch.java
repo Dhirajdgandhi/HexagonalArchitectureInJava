@@ -2,22 +2,26 @@ package AI.Assignment1.Algo;
 
 //import com.spring.boot.PriorityQueue;
 
-import AI.Assignment1.Entity.XY;
-import AI.Assignment1.UI.MainScreen;
 import AI.Assignment1.Entity.BlockNode;
 import AI.Assignment1.Entity.NodeBase;
+import AI.Assignment1.Entity.XY;
+import AI.Assignment1.UI.MainScreen;
+import AI.Assignment1.config.ApplicationContextProvider;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.*;
-import java.util.List;
 
 import static AI.Assignment1.Utility.Constants.Constant.*;
 import static AI.Assignment1.Utility.MathsCalc.calculateManhattanDistance;
 
-public class RepeatedAStarSearch {
+@Component
+public class RepeatedAStarSearch{
 
     private static final Logger LOG = LoggerFactory.getLogger(RepeatedAStarSearch.class.getName());
 
@@ -56,6 +60,7 @@ public class RepeatedAStarSearch {
         this.stateGridWorld = new HashMap();
         stateGridWorld.put(initialCell, startNode);
         stateGridWorld.put(goalCell, goalNode);
+
     }
 
     /**
@@ -65,6 +70,8 @@ public class RepeatedAStarSearch {
      * @param adaptive   True for adaptive search
      */
     public int search(boolean isBackward, boolean adaptive) throws CloneNotSupportedException {
+        WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
+
         List<XY> executedPath = new ArrayList();
 
         NodeBase goalNode = stateGridWorld.get(goalCell);
@@ -152,9 +159,9 @@ public class RepeatedAStarSearch {
         LOG.info("Executed Path : {}", executedPath);
         int executingStep = 1;
         for(XY cell : executedPath){
-            MainScreen.grid.get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
+            MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
 
-            Text tileText = MainScreen.grid.get(cell.getY()).get(cell.getX()).getText();
+            Text tileText = MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).getText();
 
             String prevText = tileText.getText();
             tileText.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
@@ -188,7 +195,7 @@ public class RepeatedAStarSearch {
             expandedNodes += 1;
 
             closedList.add(currentNode.getXy());
-            MainScreen.grid.get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GRAY);
+            MainScreen.getCurrentGrid().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GRAY);
             for (XY neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegalAndUnBlocked(neighbour, false)) {
 
@@ -214,7 +221,7 @@ public class RepeatedAStarSearch {
                         }
                         LOG.debug("Adding Neighbour to Open List : {}", neighbourNode);
                         openList.add(neighbourNode);
-                        MainScreen.grid.get(neighbourNode.getXy().getX()).get(neighbourNode.getXy().getY()).changeColor(Color.GREEN);
+                        MainScreen.getCurrentGrid().get(neighbourNode.getXy().getX()).get(neighbourNode.getXy().getY()).changeColor(Color.GREEN);
 
                     }
                 }
@@ -266,5 +273,4 @@ public class RepeatedAStarSearch {
     public int getExpandedNodes() {
         return expandedNodes;
     }
-
 }

@@ -1,6 +1,11 @@
 package AI.Assignment1.UI;
 
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +13,8 @@ import org.springframework.stereotype.Component;
 public class ForwardSearchScreen{
     Stage window;
     Scene scene;
+
+
 
 
     /*
