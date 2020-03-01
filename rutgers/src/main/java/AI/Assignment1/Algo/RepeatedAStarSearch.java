@@ -154,7 +154,7 @@ public class RepeatedAStarSearch {
         for(XY cell : executedPath){
             MainScreen.grid.get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
 
-            Text tileText = MainScreen.grid.get(cell.getY()).get(cell.getX()).text;
+            Text tileText = MainScreen.grid.get(cell.getY()).get(cell.getX()).getText();
 
             String prevText = tileText.getText();
             tileText.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));

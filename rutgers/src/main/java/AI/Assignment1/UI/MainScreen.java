@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -20,8 +21,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +30,10 @@ import java.util.stream.IntStream;
 import static AI.Assignment1.Utility.Constants.Constant.INFINITY;
 
 @SpringBootApplication
-public class MainScreen extends Application implements EventHandler {
+public class MainScreen extends Application{
 
     Stage window;
-    Scene scene, scene2, scene3, scene4;
+    Scene mainScene, secondScene;
 
     private static final int TILE_SIZE=40;
     private static final int CELLS=10;
@@ -44,18 +43,26 @@ public class MainScreen extends Application implements EventHandler {
     public static List<List<Tile>> grid, gridForward, gridBackward, gridAdaptive = new ArrayList<>();
 
     // Default Initial and Goal
-    XY initialCell = new XY(0,0);
-    XY goalCell = new XY(CELLS-1,CELLS-1);
+    public XY initialCell = new XY(0,0);
+    public XY goalCell = new XY(CELLS-1,CELLS-1);
+    private BorderPane borderPane = new BorderPane();
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage){
         window = primaryStage;
         window.setTitle("AI Assignment 1");
-        window.setResizable(true);
+        window.setResizable(false);
+        createMainScene();
+        window.setScene(mainScene);
+        window.show();
+    }
+
+    private void createMainScene(){
+
         HBox hBox = new HBox();
         {
             hBox.setStyle("-fx-background-color: #991f23;");
@@ -71,12 +78,13 @@ public class MainScreen extends Application implements EventHandler {
         VBox vBox = new VBox();
         {
             Label label = new Label();
-            label.setText("By, Dhiraj and Harsh");
+            label.setText("By, Dhiraj Gandhi and Harsh Bhatt");
             label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
             Button button = new Button("Next ->");
             button.setOnAction(e -> {
-                window.setScene(getSecondScene());
+                createSecondScene();
+                window.setScene(secondScene);
             });
             vBox.getChildren().addAll(label, button);
             vBox.setSpacing(5);
@@ -89,31 +97,29 @@ public class MainScreen extends Application implements EventHandler {
             borderPane.setCenter(vBox);
         }
 
-        scene = new Scene(borderPane, 500, 500);
-        window.setScene(scene);
-        window.show();
+        mainScene = new Scene(borderPane, 500, 500);
     }
 
-    private BorderPane borderPane = new BorderPane();
+    private void createSecondScene(){
 
-    public Scene getSecondScene(){
-        HBox hbox = addHBox("Repeated AStar Search");
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);
-        hbox.setStyle("-fx-background-color: #991f23;");
+        HBox bottomTitleHBox = addHBox("Repeated AStar Search");
+        {
+            bottomTitleHBox.setPadding(new Insets(15, 12, 15, 12));
+            bottomTitleHBox.setSpacing(10);
+            bottomTitleHBox.setStyle("-fx-background-color: #991f23;");
+        }
 
-//        border.setTop(hbox);
-//        border.setCenter(createMaze());
+        {
+            borderPane.setTop(null);
+            borderPane.setCenter(createContent());
+            borderPane.setBottom(bottomTitleHBox);
+            borderPane.setRight(createSearchOptionsVBox());
+        }
 
-        borderPane.setTop(null);
-        borderPane.setCenter(createContent());
-        borderPane.setBottom(hbox);
-        borderPane.setRight(createVBox());
-        Scene scene = new Scene(borderPane, SIZE+300, SIZE+100);
-        return scene;
+        secondScene = new Scene(borderPane, SIZE+300, SIZE+100);
     }
 
-    private VBox createVBox(){
+    private VBox createSearchOptionsVBox(){
         VBox vBox = new VBox();
         {
             vBox.setPadding(new Insets(15, 12, 15, 12));
@@ -121,22 +127,14 @@ public class MainScreen extends Application implements EventHandler {
             vBox.setStyle("-fx-background-color: #991f23;");
         }
 
-        Button resetButton = new Button("Reset");
-        {
-            resetButton.setOnAction(e->{
-                grid = new ArrayList<>();
-                borderPane.setCenter(createContent());
-            });
-        }
-
         TextField blockingProbabilityText = new TextField("0.3");
         blockingProbabilityText.setPrefWidth(40);
-        Button autoGenerate = new Button(" Auto Generate");
+        Button autoGenerate = new Button("Auto Generate Blocking");
         {
             autoGenerate.setOnAction(e->{
                 // Generate Maze with given blocking probability
-                double blockingProbabilityValue = Double.valueOf(blockingProbabilityText.getText());
-                autoGenerate(blockingProbabilityValue);
+                double blockingProbabilityValue = Double.parseDouble(blockingProbabilityText.getText());
+                autoGenerateGridWorld(blockingProbabilityValue);
             });
         }
 
@@ -148,33 +146,21 @@ public class MainScreen extends Application implements EventHandler {
             hBox.getChildren().addAll( blockingProbabilityText, autoGenerate);
         }
 
-        Button button = new Button("Forward");
-        Button button1 = new Button("Backward");
-        Button button2 = new Button("Adaptive");
-        button.setOnAction(e->{
-            try {
-                Stage window1 = new Stage();
-//                BorderPane borderPane = new BorderPane();
-//                borderPane.setCenter(root);
-//                gridForward = createContent();
-                Scene scene = new Scene(new Pane(root), SIZE+100, SIZE+100);
-                window1.setScene(scene);
-                window1.show();
+        ComboBox<String> comboBox = new ComboBox<>();
+        {
+            comboBox.getItems().addAll(
+                    "Forward",
+                    "Backward",
+                    "Adaptive"
+            );
+            comboBox.getSelectionModel().selectFirst();
+        }
 
-                new Test().repeatedForwardAStarSearch(gridWorld);
-
-            } catch (CloneNotSupportedException ex) {
-                ex.printStackTrace();
-            }
-        });
-
-
-        vBox.getChildren().addAll(hBox, resetButton, button, button1, button2);
-
+        vBox.getChildren().addAll(hBox, comboBox);
         return vBox;
     }
 
-    private void autoGenerate(double blockingProbabilityValue){
+    private void autoGenerateGridWorld(double blockingProbabilityValue){
         IntStream.range(0, CELLS).forEach(i -> {
             IntStream.range(0, CELLS).forEach(j -> {
                 Random r = new Random();
@@ -222,50 +208,63 @@ public class MainScreen extends Application implements EventHandler {
 
     public HBox addHBox(String titleString) {
         HBox hbox = new HBox();
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);
-        hbox.setStyle("-fx-background-color: #991f23;");
+        {
+            hbox.setPadding(new Insets(15, 12, 15, 12));
+            hbox.setSpacing(10);
+            hbox.setStyle("-fx-background-color: #991f23;");
+        }
 
-        Button startButton = new Button("Start");
-        startButton.setOnAction(e-> {
-            gridWorld = new GridWorld(1,grid.size(),grid.size());
-            try {
+        Button startButton = new Button("Search");
+        {
+            startButton.setOnAction(e-> {
+                gridWorld = new GridWorld(1,grid.size(),grid.size());
+                try {
 
-                IntStream.range(0, grid.size()).forEach(i -> {
-                    IntStream.range(0, grid.size()).forEach(j -> {
-                        Text text = grid.get(i).get(j).text;
-                        int value=1;
-                        if(!text.getText().isEmpty()){
-                           value= INFINITY;
-                        }
-                        ((List)gridWorld.getGridWorld().get(i)).set(j,value);
+                    IntStream.range(0, grid.size()).forEach(i -> {
+                        IntStream.range(0, grid.size()).forEach(j -> {
+                            Text text = grid.get(i).get(j).text;
+                            int value=1;
+                            if(!text.getText().isEmpty()){
+                                value= INFINITY;
+                            }
+                            ((List)gridWorld.getGridWorld().get(i)).set(j,value);
+                        });
                     });
-                });
 
-                new Test().repeatedForwardAStarSearch(gridWorld);
-            } catch (CloneNotSupportedException ex) {
-                ex.printStackTrace();
-            }
-        });
-        startButton.setPrefSize(100, 20);
+                    new Test().repeatedForwardAStarSearch(gridWorld);
+                } catch (CloneNotSupportedException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            startButton.setPrefSize(100, 20);
+        }
+
+        Button resetButton = new Button("Reset");
+        {
+            resetButton.setOnAction(e->{
+                grid = new ArrayList<>();
+                borderPane.setCenter(createContent());
+            });
+            resetButton.setPrefSize(100, 20);
+        }
 
         Text title = new Text(titleString);
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        {
+            title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        }
 
-        hbox.getChildren().addAll(title, startButton);
-
+        hbox.getChildren().addAll(title, startButton, resetButton);
         return hbox;
     }
+
+
 
     public BorderPane addBorderPane(String titleString){
         BorderPane border = new BorderPane();
         HBox hbox = addHBox(titleString);
         border.setTop(hbox);
-//        border.setLeft(addVBox());
-//        addStackPane(hbox);         // Add stack to HBox in top region
 
         border.setCenter(addGridPane("hey"));
-//        border.setRight(addFlowPane());
         return border;
     }
 
@@ -298,19 +297,6 @@ public class MainScreen extends Application implements EventHandler {
         return grid;
     }
 
-
-    public void showNewWindow(){
-        window = new Stage();
-        scene2 = new Scene(addBorderPane("Repeated Forward A*"), 1000, 1000);
-        window.setScene(scene2);
-        window.show();
-    }
-
-    @Override
-    public void handle(Event event) {
-
-    }
-
     private Pane root;
 
     private Pane createContent(){
@@ -321,15 +307,6 @@ public class MainScreen extends Application implements EventHandler {
     }
 
     private void initGrid(){
-
-//        if(grid!=null){
-//            IntStream.range(0, CELLS).forEach(i -> {
-//                IntStream.range(0, CELLS).forEach(j -> {
-//                    Tile tile = grid.get(i).get(j);
-//                    newRoot.getChildren().add(tile);
-//                });
-//            });
-//        }
 
         grid = new ArrayList<>();
 
@@ -352,7 +329,7 @@ public class MainScreen extends Application implements EventHandler {
     public class Tile extends StackPane{
         private int x,y;
         private Rectangle border = new Rectangle(TILE_SIZE-2, TILE_SIZE-2);
-        public Text text = new Text();
+        private Text text = new Text();
 
         public Tile(int x, int y) {
             this.x = x;
@@ -391,6 +368,14 @@ public class MainScreen extends Application implements EventHandler {
                 border.setFill(color);
             }
 
+        }
+
+        public Text getText() {
+            return text;
+        }
+
+        public void setText(Text text) {
+            this.text = text;
         }
     }
 }
