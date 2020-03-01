@@ -6,14 +6,11 @@ import AI.Assignment1.Entity.BlockNode;
 import AI.Assignment1.Entity.NodeBase;
 import AI.Assignment1.Entity.XY;
 import AI.Assignment1.UI.MainScreen;
-import AI.Assignment1.config.ApplicationContextProvider;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.*;
 
@@ -84,7 +81,7 @@ public class RepeatedAStarSearch{
             currentNode.setVisited(counter);
 
             // Same for B and F
-            openList = new PriorityQueue<>(50000);
+            openList = new PriorityQueue<>(50000, idComparator);
             closedList = new LinkedList<>();
 
             // See your visible cells and update your Visible World
@@ -274,4 +271,17 @@ public class RepeatedAStarSearch{
     public int getExpandedNodes() {
         return expandedNodes;
     }
+
+    //Comparator anonymous class implementation
+    public static Comparator<NodeBase> idComparator = new Comparator<NodeBase>(){
+
+        @Override
+        public int compare(NodeBase c1, NodeBase c2) {
+            int value = (c1.getFValue() - c2.getFValue());
+            if(value==0){
+                value = (c1.getGValue() - c2.getGValue());
+            }
+            return value;
+        }
+    };
 }

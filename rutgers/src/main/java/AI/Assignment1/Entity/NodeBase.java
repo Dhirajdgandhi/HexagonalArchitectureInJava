@@ -2,7 +2,7 @@ package AI.Assignment1.Entity;
 
 import org.springframework.data.util.Pair;
 
-public class NodeBase implements Comparable, Cloneable {
+public class NodeBase implements Cloneable {
 
     private String name = "", description = "";
     private int fValue = 0, hValue = 0, gValue = 0;
@@ -106,14 +106,19 @@ public class NodeBase implements Comparable, Cloneable {
         return !backward ? childNode : parentNode;
     }
 
-    @Override
-    public int compareTo(Object o) {
-        NodeBase node = (NodeBase)o;
-//        if(fValue == node.getFValue()){
-//            return Integer.compare(node.getGValue(), gValue );
-//        }
-        return Integer.compare(fValue, node.getFValue());
-    }
+//    @Override
+//    public int compareTo(Object o) {
+//        NodeBase node = (NodeBase)o;
+////        int compareValue = 100000000*fValue - gValue;
+////        int toCompareValue = 100000000*node.getFValue() - node.getGValue();
+//
+////        return Integer.compare(compareValue, toCompareValue);
+//
+////        if(fValue == node.getFValue()){
+////            return Integer.compare(node.getGValue(), gValue );
+////        }
+//        return Integer.compare(fValue, node.getFValue());
+//    }
 
     @Override
     public NodeBase clone() throws CloneNotSupportedException {
