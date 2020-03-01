@@ -17,7 +17,6 @@ import java.util.*;
 import static AI.Assignment1.Utility.Constants.Constant.*;
 import static AI.Assignment1.Utility.MathsCalc.calculateManhattanDistance;
 
-@Component
 public class RepeatedAStarSearch{
 
     private static final Logger LOG = LoggerFactory.getLogger(RepeatedAStarSearch.class.getName());

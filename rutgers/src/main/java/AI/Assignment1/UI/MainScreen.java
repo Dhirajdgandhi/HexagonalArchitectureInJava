@@ -35,8 +35,8 @@ public class MainScreen extends Application {
     Stage window, forwardWindow, backwardWindow, adaptiveWindow;
     Scene mainScene, secondScene, forwardScene, backwardScene, adaptiveScene;
 
-    private static final int TILE_SIZE = 10;
-    private static final int CELLS = 100;
+    private static final int TILE_SIZE = 40;
+    private static final int CELLS = 5;
     private static final int SIZE = CELLS * TILE_SIZE;
 
     // Independent Grids for all possible searches
@@ -49,8 +49,9 @@ public class MainScreen extends Application {
     private static List<List<Tile>> currentGrid = new ArrayList<>();
 
     // Default Initial and Goal
-    public XY initialCell = new XY(0, 0);
-    public XY goalCell = new XY(CELLS - 1, CELLS - 1);
+    public XY initialCell = new XY(4, 2);
+//    public XY goalCell = new XY(CELLS - 1, CELLS - 1);
+    public XY goalCell = new XY(4, 4);
     private BorderPane borderPane = new BorderPane();
     private Pane rootGridPane;
     private Pane forwardGridPane;
@@ -537,8 +538,8 @@ public class MainScreen extends Application {
     }
 
     private void setInitAndGoalCell() {
-        mainGrid.get(initialCell.getX()).get(initialCell.getY()).border.setFill(Color.AQUA);
-        mainGrid.get(goalCell.getX()).get(goalCell.getY()).border.setFill(Color.RED);
+        mainGrid.get(initialCell.getY()).get(initialCell.getX()).border.setFill(Color.AQUA);
+        mainGrid.get(goalCell.getY()).get(goalCell.getX()).border.setFill(Color.RED);
     }
 
     public static List<List<Tile>> getCurrentGrid() {
