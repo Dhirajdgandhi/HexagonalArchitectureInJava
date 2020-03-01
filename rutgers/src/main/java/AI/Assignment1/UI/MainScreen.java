@@ -1,6 +1,7 @@
 package AI.Assignment1.UI;
 
 import AI.Assignment1.Algo.GridWorld;
+import AI.Assignment1.Entity.XY;
 import javafx.application.Application;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 
+import static AI.Assignment1.Utility.Constants.Constant.INFINITY;
+
 @SpringBootApplication
 public class MainScreen extends Application implements EventHandler {
 
@@ -41,8 +44,8 @@ public class MainScreen extends Application implements EventHandler {
     public static List<List<Tile>> grid, gridForward, gridBackward, gridAdaptive = new ArrayList<>();
 
     // Default Initial and Goal
-    Pair<Integer, Integer> initialCell = Pair.of(0,0);
-    Pair<Integer, Integer> goalCell = Pair.of(CELLS-1,CELLS-1);
+    XY initialCell = new XY(0,0);
+    XY goalCell = new XY(CELLS-1,CELLS-1);
 
     public static void main(String[] args) {
         launch(args);
@@ -233,7 +236,7 @@ public class MainScreen extends Application implements EventHandler {
                         Text text = grid.get(i).get(j).text;
                         int value=1;
                         if(!text.getText().isEmpty()){
-                           value= Test.INFINITY;
+                           value= INFINITY;
                         }
                         ((List)gridWorld.getGridWorld().get(i)).set(j,value);
                     });
@@ -342,8 +345,8 @@ public class MainScreen extends Application implements EventHandler {
     }
 
     private void setInitAndGoalCell(){
-        grid.get(initialCell.getFirst()).get(initialCell.getSecond()).border.setFill(Color.BLUE);
-        grid.get(goalCell.getFirst()).get(goalCell.getSecond()).border.setFill(Color.RED);
+        grid.get(initialCell.getX()).get(initialCell.getY()).border.setFill(Color.BLUE);
+        grid.get(goalCell.getX()).get(goalCell.getY()).border.setFill(Color.RED);
     }
 
     public class Tile extends StackPane{

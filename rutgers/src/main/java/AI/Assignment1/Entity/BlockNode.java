@@ -6,7 +6,7 @@ public class BlockNode extends NodeBase {
     public BlockNode() {
     }
 
-    public BlockNode(Pair<Integer, Integer> xy) {
+    public BlockNode(XY xy) {
         super(xy);
     }
 }

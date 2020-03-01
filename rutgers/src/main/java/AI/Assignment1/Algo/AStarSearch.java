@@ -10,7 +10,7 @@
 //import java.util.*;
 //import java.util.stream.IntStream;
 //
-//import static com.spring.boot.MathsCalc.calculateManhattanDistance;
+//import static AI.Assignment1.Utility.MathsCalc.calculateManhattanDistance;
 //
 //public class AStarSearch {
 //
@@ -32,7 +32,7 @@
 //     * @return Optimal Cost to the GOAL
 //     *          -1 : If there's no way to REACH THE GOAL
 //     * */
-//    public int getOptimalPathCostToReachGoal(List<List> environment, Pair<Integer, Integer> initialCell, Pair<Integer, Integer> goalCell){
+//    public int getOptimalPathCostToReachGoal(List<List> environment, XY initialCell, XY goalCell){
 //        MAX_Y = environment.size() - 1;
 //        MAX_X = environment.get(0).size() - 1;
 //
@@ -44,7 +44,7 @@
 //        currentNode.setXy(initialCell);
 //
 //        openList.insert(currentNode);
-//        Pair<Integer, Integer> currentCell = initialCell;
+//        XY currentCell = initialCell;
 //
 //        while(!openList.isEmpty()){
 //            currentNode = openList.getHighestPriority();
@@ -61,10 +61,10 @@
 //            int x = currentNode.getXy().getFirst();
 //            int y = currentNode.getXy().getSecond();
 //
-//            List<Pair<Integer, Integer>> neighbourList =
+//            List<XY> neighbourList =
 //                    new ArrayList<>(Arrays.asList(Pair.of(x,y+1), Pair.of(x+1,y), Pair.of(x,y-1), Pair.of(x-1,y)));
 //
-//            for (Pair<Integer, Integer> neighbour : neighbourList) {
+//            for (XY neighbour : neighbourList) {
 //                if(
 //                        isCellLegal(neighbour)   // Legal Cell
 //                        && !isCellBlocked(environment, neighbour) // Un-blocked Cell
@@ -106,7 +106,7 @@
 //        return pathCost;
 //    }
 //
-//    private Boolean isCellLegal(Pair<Integer, Integer> cell){
+//    private Boolean isCellLegal(XY cell){
 //        return cell.getFirst() >= MIN_X  && cell.getFirst() <= MAX_X && cell.getSecond() >= MIN_Y && cell.getSecond() <= MAX_Y;
 //    }
 //
@@ -142,7 +142,7 @@
 //     * @param A Co-ordinates of the cell to be checked
 //     * @return True if the Cell is Blocked
 //     * */
-//    private Boolean isCellBlocked(List<List> gridWorld, Pair<Integer, Integer> A){
+//    private Boolean isCellBlocked(List<List> gridWorld, XY A){
 //        return isCellLegal(A) && gridWorld.get(A.getSecond()).get(A.getFirst()).equals(BLOCKED_CELL);
 //    }
 //}

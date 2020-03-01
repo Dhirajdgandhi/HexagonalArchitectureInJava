@@ -6,14 +6,14 @@ public class NodeBase implements Comparable, Cloneable {
 
     private String name = "", description = "";
     private int fValue = 0, hValue = 0, gValue = 0;
-    private Pair<Integer, Integer> xy; // Grid cell co-ordinates
+    private XY xy; // Grid cell co-ordinates
     private NodeBase parentNode, childNode;
     private int visited = 0, visible = 0;
 
     public NodeBase() {
     }
 
-    public NodeBase(Pair<Integer, Integer> xy) {
+    public NodeBase(XY xy) {
         this.xy = xy;
     }
 
@@ -37,7 +37,7 @@ public class NodeBase implements Comparable, Cloneable {
         return this.gValue;
     }
 
-    public Pair<Integer, Integer> getXy() {
+    public XY getXy() {
         return this.xy;
     }
 
@@ -84,7 +84,7 @@ public class NodeBase implements Comparable, Cloneable {
         this.gValue = gValue;
     }
 
-    public void setXy(Pair<Integer, Integer> xy) {
+    public void setXy(XY xy) {
         this.xy = xy;
     }
 
@@ -139,7 +139,7 @@ public class NodeBase implements Comparable, Cloneable {
 
     @Override
     public String toString() {
-        Pair parent = null;
+        XY parent = null;
         if(getParentNode()!=null){
             parent = getParentNode().getXy();
         }

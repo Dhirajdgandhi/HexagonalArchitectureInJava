@@ -1,13 +1,14 @@
 package com.spring.boot;
 
-import Assignment1.Nodes.NodeBase;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Priority Queue implemented as an ArrayList
  * */
-public class PriorityQueue<T extends NodeBase> implements Collection {
+public class PriorityQueue<T extends Comparable> implements Collection {
 
     private List<T> queue = new ArrayList<T>();
     static HeapSort heapSort;
@@ -26,7 +27,7 @@ public class PriorityQueue<T extends NodeBase> implements Collection {
 
     static
     {
-        heapSort = new HeapSort<NodeBase>();
+        heapSort = new HeapSort<>();
     }
 
     public void insert(T node){

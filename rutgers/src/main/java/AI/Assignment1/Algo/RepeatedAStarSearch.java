@@ -2,39 +2,38 @@ package AI.Assignment1.Algo;
 
 //import com.spring.boot.PriorityQueue;
 
+import AI.Assignment1.Entity.XY;
 import AI.Assignment1.UI.MainScreen;
 import AI.Assignment1.Entity.BlockNode;
 import AI.Assignment1.Entity.NodeBase;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.util.Pair;
 
 import java.util.*;
+import java.util.List;
 
 import static AI.Assignment1.Utility.Constants.Constant.*;
-import static com.spring.boot.MathsCalc.calculateManhattanDistance;
+import static AI.Assignment1.Utility.MathsCalc.calculateManhattanDistance;
 
 public class RepeatedAStarSearch {
 
     private static final Logger LOG = LoggerFactory.getLogger(RepeatedAStarSearch.class.getName());
-//
-//    static int MIN_X, MIN_Y = 0;
-//    static final int INFINITY = 999999999;
-//    static final int BLOCKED_CELL = INFINITY;
+
     private int MAX_X, MAX_Y;
 
     private GridWorld<Integer> gridWorld;
     private PriorityQueue<NodeBase> openList;
-    private LinkedList<Pair<Integer, Integer>> closedList;
-    private Pair<Integer, Integer> initialCell, goalCell;
+    private LinkedList<XY> closedList;
+    private XY initialCell, goalCell;
     private int expandedNodes = 0;
-    private Map<Pair<Integer, Integer>, NodeBase> stateGridWorld;
+    private Map<XY, NodeBase> stateGridWorld;
 
     public RepeatedAStarSearch() {
     }
 
-    public RepeatedAStarSearch(GridWorld<Integer> gridWorld, Pair<Integer, Integer> initialCell, Pair<Integer, Integer> goalCell) {
+    public RepeatedAStarSearch(GridWorld<Integer> gridWorld, XY initialCell, XY goalCell) {
         this.MAX_Y = gridWorld.rowSize();
         this.MAX_X = gridWorld.colSize();
         this.gridWorld = gridWorld;
@@ -66,7 +65,7 @@ public class RepeatedAStarSearch {
      * @param adaptive   True for adaptive search
      */
     public int search(boolean isBackward, boolean adaptive) throws CloneNotSupportedException {
-        List<Pair> executedPath = new ArrayList();
+        List<XY> executedPath = new ArrayList();
 
         NodeBase goalNode = stateGridWorld.get(goalCell);
         NodeBase currentNode = stateGridWorld.get(initialCell);
@@ -85,7 +84,7 @@ public class RepeatedAStarSearch {
 
             // See your visible cells and update your Visible World
             // Same for B and F
-            for (Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)) {
+            for (XY neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegal(neighbour)) {
                     // If no Node created yet, then first create and add it to map
                     if (!stateGridWorld.containsKey(neighbour)) {
@@ -104,7 +103,7 @@ public class RepeatedAStarSearch {
 
             if (!openList.isEmpty()) {
                 NodeBase node = currentNode;
-                List<Pair<Integer, Integer>> plannedPath = new ArrayList<>();
+                List<XY> plannedPath = new ArrayList<>();
 
                 if (!isBackward) { // Establish Reverse links from G->S to have S->G links
                     node = goalNode;
@@ -123,23 +122,21 @@ public class RepeatedAStarSearch {
                 if (adaptive) {
                     int lengthOfPath = plannedPath.size() - 1;
 
-                    for (Pair<Integer, Integer> i : plannedPath) {
+                    for (XY i : plannedPath) {
                         stateGridWorld.get(i).setHValue(lengthOfPath--);
                     }
-                    ;
                 }
 
                 LOG.debug("Planned Path for execution is : {}", plannedPath);
 
                 // Execution uses Real Grid World
                 LOG.debug("Execution Begins");
-                for (Pair<Integer, Integer> cell : plannedPath.subList(1, plannedPath.size())) {
+                for (XY cell : plannedPath.subList(1, plannedPath.size())) {
                     if (isCellLegalAndUnBlocked(cell, true)) {
                         cost += 1;
                         executedPath.add(cell);
                         LOG.debug("Moved to Cell : {}", cell);
                         currentNode = stateGridWorld.get(cell);
-                        ;
                     } else {
                         // Run AStar with currentNode again
                         break;
@@ -154,11 +151,14 @@ public class RepeatedAStarSearch {
 
         LOG.info("Executed Path : {}", executedPath);
         int executingStep = 1;
-        for(Pair<Integer, Integer> cell : executedPath){
-            MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).changeColor(Color.YELLOW);
-            String prevText = MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).text.getText();
-            MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).text.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
-            MainScreen.grid.get(cell.getSecond()).get(cell.getFirst()).text.setFill(Color.BLACK);
+        for(XY cell : executedPath){
+            MainScreen.grid.get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
+
+            Text tileText = MainScreen.grid.get(cell.getY()).get(cell.getX()).text;
+
+            String prevText = tileText.getText();
+            tileText.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
+            tileText.setFill(Color.BLACK);
             executingStep+=1;
         }
         return cost;
@@ -188,8 +188,8 @@ public class RepeatedAStarSearch {
             expandedNodes += 1;
 
             closedList.add(currentNode.getXy());
-            MainScreen.grid.get(currentNode.getXy().getFirst()).get(currentNode.getXy().getSecond()).changeColor(Color.GRAY);
-            for (Pair<Integer, Integer> neighbour : retrieveNeighbours(currentNode)) {
+            MainScreen.grid.get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GRAY);
+            for (XY neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegalAndUnBlocked(neighbour, false)) {
 
                     if (!stateGridWorld.containsKey(neighbour)) {
@@ -214,7 +214,7 @@ public class RepeatedAStarSearch {
                         }
                         LOG.debug("Adding Neighbour to Open List : {}", neighbourNode);
                         openList.add(neighbourNode);
-                        MainScreen.grid.get(neighbourNode.getXy().getFirst()).get(neighbourNode.getXy().getSecond()).changeColor(Color.GREEN);
+                        MainScreen.grid.get(neighbourNode.getXy().getX()).get(neighbourNode.getXy().getY()).changeColor(Color.GREEN);
 
                     }
                 }
@@ -235,34 +235,24 @@ public class RepeatedAStarSearch {
     /**
      * Retrieves Neighbour List
      */
-    private List<Pair<Integer, Integer>> retrieveNeighbours(NodeBase node) {
-        int x = node.getXy().getFirst();
-        int y = node.getXy().getSecond();
+    private List<XY> retrieveNeighbours(NodeBase node) {
+        int x = node.getXy().getX();
+        int y = node.getXy().getY();
 
-        return new ArrayList<>(Arrays.asList(Pair.of(x, y + 1), Pair.of(x + 1, y), Pair.of(x, y - 1), Pair.of(x - 1, y)));
+        return new ArrayList<>(Arrays.asList(new XY(x, y + 1), new XY(x + 1, y), new XY(x, y - 1), new XY(x - 1, y)));
+    }
+
+    private Boolean isCellLegal(XY cell) {
+        return cell.getX() >= MIN_X && cell.getX() < MAX_X && cell.getY() >= MIN_Y && cell.getY() < MAX_Y;
     }
 
     /**
-     * Get the Optimal Path Cost to the Goal
-     * environment States the problem in terms of a Collection like a Matrix
-     * or a LinkedList or a HashMap or a composition of all these
-     *
-     * @return Optimal Cost to the GOAL
-     * -1 : If there's no way to REACH THE GOAL
-     */
-
-
-    private Boolean isCellLegal(Pair<Integer, Integer> cell) {
-        return cell.getFirst() >= MIN_X && cell.getFirst() < MAX_X && cell.getSecond() >= MIN_Y && cell.getSecond() < MAX_Y;
-    }
-
-    /**
-     * Checks if given Cell is blocked
+     * Checks if given Cell is legal and blocked
      *
      * @param A Co-ordinates of the cell to be checked
      * @return True if the Cell is Legal and UnBlocked
      */
-    private Boolean isCellLegalAndUnBlocked(Pair<Integer, Integer> A, boolean seeRealWorldValue) {
+    private Boolean isCellLegalAndUnBlocked(XY A, boolean seeRealWorldValue) {
         if (isCellLegal(A)) {
             if (!stateGridWorld.containsKey(A)) stateGridWorld.put(A, new BlockNode(A));
 
@@ -272,17 +262,6 @@ public class RepeatedAStarSearch {
             return false;
         }
     }
-
-    /*public void printPathToGoal(){
-        LOG.info("Path to Goal : ");
-        NodeBase node = startNode;
-        List plannedPath = new ArrayList();
-        do{
-            plannedPath.add(node.getXy());
-            node = node.getChildNode();
-        } while(node!=null); // Stops at the Current Node
-        LOG.info("Planned Path for execution is : {}", plannedPath);
-    }*/
 
     public int getExpandedNodes() {
         return expandedNodes;

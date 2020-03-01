@@ -2,6 +2,7 @@ package AI.Assignment1;
 
 import AI.Assignment1.Algo.GridWorld;
 import AI.Assignment1.Algo.RepeatedAStarSearch;
+import AI.Assignment1.Entity.XY;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -69,8 +70,8 @@ public class TestApplicationRepeatedAStar {
 
     public int repeatedForwardAStarSearch(GridWorld gridWorld, int MAX_ROW, int MAX_COL) throws CloneNotSupportedException {
 
-        Pair start = Pair.of(0, 0);
-        Pair goal = Pair.of(MAX_ROW - 1, MAX_COL - 1);
+        XY start = new XY(0, 0);
+        XY goal = new XY(MAX_ROW - 1, MAX_COL - 1);
 
         LOG.info("****** Repeated Forward A* Search *******");
         gridWorld.set(start, 1);

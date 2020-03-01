@@ -1,5 +1,6 @@
 package AI.Assignment1.Algo;
 
+import AI.Assignment1.Entity.XY;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
@@ -29,18 +30,18 @@ public class GridWorld<T> {
     /** Utility to fetch value using
      * @param xy Coordinates
      * */
-    public T get(Pair<Integer, Integer> xy) {
-        int row = xy.getSecond();
-        int col = xy.getFirst();
+    public T get(XY xy) {
+        int row = xy.getY();
+        int col = xy.getX();
         return gridWorld.get(row).get(col);
     }
 
     /** Utility to set value using
      * @param xy Coordinates
      * */
-    public void set(Pair<Integer, Integer> xy, T value) {
-        int row = xy.getSecond();
-        int col = xy.getFirst();
+    public void set(XY xy, T value) {
+        int row = xy.getY();
+        int col = xy.getX();
         gridWorld.get(row).set(col, value);
     }
 
@@ -59,7 +60,7 @@ public class GridWorld<T> {
             System.out.println("");
             IntStream.range(0, colSize()).forEach(
                     col -> {
-                        System.out.print(" " + get(Pair.of(col, rowList[0])) + " |");
+                        System.out.print(" " + get(new XY(col, rowList[0])) + " |");
                     }
             );
             System.out.println("");

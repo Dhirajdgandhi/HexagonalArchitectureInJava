@@ -1,5 +1,6 @@
-package com.spring.boot;
+package AI.Assignment1.Utility;
 
+import AI.Assignment1.Entity.XY;
 import org.springframework.data.util.Pair;
 
 public abstract class MathsCalc {
@@ -7,9 +8,9 @@ public abstract class MathsCalc {
      * Calculates Manhattan Distance between 2 points on a 2D plane
      * This distance is used for calculating Heuristics
      * */
-    public static int calculateManhattanDistance(Pair<Integer, Integer> A, Pair<Integer, Integer> B){
-        return Math.abs(A.getFirst() - B.getFirst())
-                + Math.abs(A.getSecond() - B.getSecond());
+    public static int calculateManhattanDistance(XY A, XY B){
+        return Math.abs(A.getX() - B.getX())
+                + Math.abs(A.getY() - B.getY());
     }
 
     private static long calculateEuclideanDistance(Pair A, Pair B){

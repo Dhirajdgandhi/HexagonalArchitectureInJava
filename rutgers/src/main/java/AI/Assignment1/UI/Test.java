@@ -2,6 +2,7 @@ package AI.Assignment1.UI;
 
 import AI.Assignment1.Algo.GridWorld;
 import AI.Assignment1.Algo.RepeatedAStarSearch;
+import AI.Assignment1.Entity.XY;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
@@ -63,8 +64,8 @@ public class Test {
     public int repeatedForwardAStarSearch(GridWorld gridWorld) throws CloneNotSupportedException {
 
         int MAX_ROW = gridWorld.rowSize() , MAX_COL = gridWorld.colSize();
-        Pair start = Pair.of(0, 0);
-        Pair goal = Pair.of(MAX_ROW - 1, MAX_COL - 1);
+        XY start = new XY(0, 0);
+        XY goal = new XY(MAX_ROW - 1, MAX_COL - 1);
 
         LOG.info("****** Repeated Forward A* Search *******");
         gridWorld.set(start, 1);
