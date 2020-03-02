@@ -10,7 +10,16 @@ import java.util.List;
 public class HeapSort<T>{
 
     Logger LOG = Logger.getLogger(HeapSort.class.getName());
-    static Comparator comparator = Comparator.naturalOrder();
+    Comparator comparator;
+
+    public HeapSort() {
+        this.comparator = Comparator.naturalOrder();
+    }
+
+    public HeapSort(Comparator comparator) {
+        this.comparator = comparator;
+    }
+
 
     public void sort(List<T> array){
         int length = array.size();

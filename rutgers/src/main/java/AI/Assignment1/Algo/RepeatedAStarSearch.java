@@ -1,6 +1,5 @@
 package AI.Assignment1.Algo;
 
-//import com.spring.boot.PriorityQueue;
 
 import AI.Assignment1.Entity.BlockNode;
 import AI.Assignment1.Entity.NodeBase;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+//import com.spring.boot.PriorityQueue;
 
 import static AI.Assignment1.Utility.Constants.Constant.*;
 import static AI.Assignment1.Utility.MathsCalc.calculateManhattanDistance;
