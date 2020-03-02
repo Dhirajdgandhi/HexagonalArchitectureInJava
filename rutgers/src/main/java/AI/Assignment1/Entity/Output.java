@@ -1,40 +1,40 @@
 package AI.Assignment1.Entity;
 
 public class Output {
-    int cost;
-    int runtime;
-    int expandedNodes;
+    long cost;
+    long runtime;
+    long expandedNodes;
 
     public Output() {
     }
 
-    public Output(int cost, int runtime, int expandedNodes) {
+    public Output(long cost, long runtime, long expandedNodes) {
         this.cost = cost;
         this.runtime = runtime;
         this.expandedNodes = expandedNodes;
     }
 
-    public int getCost() {
+    public long getCost() {
         return cost;
     }
 
-    public void setCost(int cost) {
+    public void setCost(long cost) {
         this.cost = cost;
     }
 
-    public int getRuntime() {
+    public long getRuntime() {
         return runtime;
     }
 
-    public void setRuntime(int runtime) {
+    public void setRuntime(long runtime) {
         this.runtime = runtime;
     }
 
-    public int getExpandedNodes() {
+    public long getExpandedNodes() {
         return expandedNodes;
     }
 
-    public void setExpandedNodes(int expandedNodes) {
+    public void setExpandedNodes(long expandedNodes) {
         this.expandedNodes = expandedNodes;
     }
 }

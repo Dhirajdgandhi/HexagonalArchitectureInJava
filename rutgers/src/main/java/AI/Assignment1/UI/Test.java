@@ -32,7 +32,7 @@ public class Test {
         IntStream.range(0, runs).forEach(i -> {
             try {
                 Output output = createMazeAndSearch();
-                sumCost.set(0, sumCost.get(0) + output.getCost());
+                sumCost.set(0, (int)sumCost.get(0) + (int)output.getCost());
                 LOG.info("\n\n\n");
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
@@ -67,10 +67,10 @@ public class Test {
 
         RepeatedAStarSearch repeatedBackwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
-        int backwardCost = repeatedBackwardAStarSearch.search(true, false);
+        long backwardCost = repeatedBackwardAStarSearch.search(true, false);
         endTimer();
-        int expandedNodes = repeatedBackwardAStarSearch.getExpandedNodes();
-        int runTime = (int) (endTime - startTime) / 1000;
+        long expandedNodes = repeatedBackwardAStarSearch.getExpandedNodes();
+        long runTime = (int) (endTime - startTime) / 1000;
         LOG.info("The Repeated AStar Backward Search took {} microsecs with cost of : {} and expanded : {}nodes", runTime, backwardCost, expandedNodes);
 
         Output output = new Output();
@@ -87,10 +87,10 @@ public class Test {
 
         RepeatedAStarSearch repeatedForwardAdaptiveAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
-        int adaptiveForwardCost = repeatedForwardAdaptiveAStarSearch.search(false, true);
+        long adaptiveForwardCost = repeatedForwardAdaptiveAStarSearch.search(false, true);
         endTimer();
-        int expandedNodes = repeatedForwardAdaptiveAStarSearch.getExpandedNodes();
-        int runTime = (int) (endTime - startTime) / 1000;
+        long expandedNodes = repeatedForwardAdaptiveAStarSearch.getExpandedNodes();
+        long runTime = (int) (endTime - startTime) / 1000;
         LOG.info("The Repeated Adaptive AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", runTime, adaptiveForwardCost, expandedNodes);
 
         Output output = new Output();
@@ -111,10 +111,10 @@ public class Test {
         gridWorld.printGridWorldState();
         RepeatedAStarSearch repeatedForwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
-        int forwardCost = repeatedForwardAStarSearch.search(false, false);
-        int expandedNodes = repeatedForwardAStarSearch.getExpandedNodes();
+        long forwardCost = repeatedForwardAStarSearch.search(false, false);
+        long expandedNodes = repeatedForwardAStarSearch.getExpandedNodes();
         endTimer();
-        int runTime = (int) (endTime - startTime) / 1000;
+        long runTime = (int) (endTime - startTime) / 1000;
         LOG.info("The Repeated AStar Forward Search took {} microsecs with cost of : {} and expanded : {}nodes", runTime, forwardCost,expandedNodes);
 
         output.setCost(forwardCost);
