@@ -35,8 +35,8 @@ public class MainScreen extends Application {
     Stage window, forwardWindow, backwardWindow, adaptiveWindow;
     Scene mainScene, secondScene, forwardScene, backwardScene, adaptiveScene;
 
-    private static final int TILE_SIZE = 40;
-    private static final int CELLS = 5;
+    private static final int TILE_SIZE = 20;
+    private static final int CELLS = 50;
     private static final int SIZE = CELLS * TILE_SIZE;
 
     // Independent Grids for all possible searches
@@ -49,9 +49,9 @@ public class MainScreen extends Application {
     private static List<List<Tile>> currentGrid = new ArrayList<>();
 
     // Default Initial and Goal
-    public XY initialCell = new XY(4, 2);
-//    public XY goalCell = new XY(CELLS - 1, CELLS - 1);
-    public XY goalCell = new XY(4, 4);
+    public XY initialCell = new XY(0, 0);
+    public XY goalCell = new XY(CELLS - 1, CELLS - 1);
+//    public XY goalCell = new XY(4, 4);
     private BorderPane borderPane = new BorderPane();
     private Pane rootGridPane;
     private Pane forwardGridPane;
@@ -70,6 +70,10 @@ public class MainScreen extends Application {
     Text fExpandedNodes = new Text();
     Text bExpandedNodes = new Text();
     Text aExpandedNodes = new Text();
+
+    Output forwardOutput = new Output();
+    Output backwardOutput = new Output();
+    Output adaptiveOutput = new Output();
 
     public static void main(String[] args) {
         SpringApplication.run(MainScreen.class);
@@ -255,33 +259,9 @@ public class MainScreen extends Application {
                 GridWorld gridWorld = createGridWorldUsingTileGrid();
 
                 // On Search Button -
-                try {
-                    switch (titleString) {
-                        case FORWARD: {
-                            Output output = test.repeatedForwardAStarSearch(initialCell, goalCell, gridWorld);
-                            fCost.textProperty().setValue(String.valueOf(output.getCost()));
-                            fExpandedNodes.textProperty().setValue(String.valueOf(output.getExpandedNodes()));
-                            fRunTime.textProperty().setValue(String.valueOf(output.getRuntime()));
-                            break;
-                        }
-                        case BACKWARD: {
-                            Output output = test.repeatedBackwardAStarSearch(initialCell, goalCell, gridWorld);
-                            bCost.textProperty().setValue(String.valueOf(output.getCost()));
-                            bExpandedNodes.textProperty().setValue(String.valueOf(output.getExpandedNodes()));
-                            bRunTime.textProperty().setValue(String.valueOf(output.getRuntime()));
-                            break;
-                        }
-                        case ADAPTIVE: {
-                            Output output = test.repeatedAdaptiveAStarSearch(initialCell, goalCell, gridWorld);
-                            aCost.textProperty().setValue(String.valueOf(output.getCost()));
-                            aExpandedNodes.textProperty().setValue(String.valueOf(output.getExpandedNodes()));
-                            aRunTime.textProperty().setValue(String.valueOf(output.getRuntime()));
-                            break;
-                        }
-                    }
-                } catch (CloneNotSupportedException ex) {
-                    ex.printStackTrace();
-                }
+                MyRunnable myRunnable = new MyRunnable(gridWorld, titleString);
+                Thread t = new Thread(myRunnable);
+                t.start();
             });
             startButton.setPrefSize(100, 20);
         }
@@ -535,6 +515,73 @@ public class MainScreen extends Application {
             });
         });
         setInitAndGoalCell();
+    }
+
+
+    public class MyRunnable implements Runnable {
+
+        private GridWorld gridWorld;
+        private Output output;
+        private String titleString;
+
+        public MyRunnable(GridWorld gridWorld, String titleString) {
+            this.gridWorld = gridWorld;
+            this.titleString = titleString;
+        }
+
+        public void run() {
+            // code in the other thread, can reference "var" variable
+            try {
+                switch (titleString) {
+                    case FORWARD: {
+                        Output newOutput = test.repeatedForwardAStarSearch(initialCell, goalCell, gridWorld);
+
+                        forwardOutput.setRuntime(newOutput.getRuntime());
+                        forwardOutput.setExpandedNodes(newOutput.getExpandedNodes());
+                        forwardOutput.setCost(newOutput.getCost());
+
+                        fCost.textProperty().setValue(String.valueOf(forwardOutput.getCost()));
+                        fExpandedNodes.textProperty().setValue(String.valueOf(forwardOutput.getExpandedNodes()));
+                        fRunTime.textProperty().setValue(String.valueOf(forwardOutput.getRuntime()));
+                        break;
+                    }
+                    case BACKWARD: {
+                        Output newOutput = test.repeatedBackwardAStarSearch(initialCell, goalCell, gridWorld);
+
+                        backwardOutput.setRuntime(newOutput.getRuntime());
+                        backwardOutput.setExpandedNodes(newOutput.getExpandedNodes());
+                        backwardOutput.setCost(newOutput.getCost());
+
+                        bCost.textProperty().setValue(String.valueOf(backwardOutput.getCost()));
+                        bExpandedNodes.textProperty().setValue(String.valueOf(backwardOutput.getExpandedNodes()));
+                        bRunTime.textProperty().setValue(String.valueOf(backwardOutput.getRuntime()));
+                        break;
+                    }
+                    case ADAPTIVE: {
+                        Output newOutput = test.repeatedAdaptiveAStarSearch(initialCell, goalCell, gridWorld);
+
+                        adaptiveOutput.setRuntime(newOutput.getRuntime());
+                        adaptiveOutput.setExpandedNodes(newOutput.getExpandedNodes());
+                        adaptiveOutput.setCost(newOutput.getCost());
+
+                        aCost.textProperty().setValue(String.valueOf(adaptiveOutput.getCost()));
+                        aExpandedNodes.textProperty().setValue(String.valueOf(adaptiveOutput.getExpandedNodes()));
+                        aRunTime.textProperty().setValue(String.valueOf(adaptiveOutput.getRuntime()));
+                        break;
+                    }
+                }
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public Output getOutput() {
+            return output;
+        }
+
+        public void setOutput(Output output) {
+            this.output = output;
+        }
     }
 
     private void setInitAndGoalCell() {

@@ -46,4 +46,11 @@ public class XY {
     public int hashCode() {
         return Objects.hash(xy);
     }
+
+    @Override
+    public String toString() {
+        return "XY{" +
+                "xy=" + xy +
+                '}';
+    }
 }

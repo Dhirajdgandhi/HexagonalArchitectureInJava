@@ -2,10 +2,12 @@ package AI.Assignment1.Entity;
 
 import org.springframework.data.util.Pair;
 
+import static AI.Assignment1.Utility.Constants.Constant.INFINITY;
+
 public class NodeBase implements Cloneable {
 
     private String name = "", description = "";
-    private int fValue = 0, hValue = 0, gValue = 0;
+    private int fValue = 0, hValue = 0, gValue = INFINITY - 1000;
     private XY xy; // Grid cell co-ordinates
     private NodeBase parentNode, childNode;
     private int visited = 0, visible = 0;

@@ -63,6 +63,8 @@ public class Test {
         gridWorld.set(start, 1);
         gridWorld.set(goal, 1);
 
+        gridWorld.printGridWorldState();
+
         RepeatedAStarSearch repeatedBackwardAStarSearch = new RepeatedAStarSearch(gridWorld, start, goal);
         startTimer();
         int backwardCost = repeatedBackwardAStarSearch.search(true, false);

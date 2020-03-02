@@ -73,6 +73,11 @@ public class RepeatedAStarSearch{
         int counter = 0, cost = 0;
 
         while (!currentNode.equals(goalNode)) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             counter += 1;
 
             // Same for B and F
@@ -154,7 +159,11 @@ public class RepeatedAStarSearch{
         int executingStep = 1;
         for(XY cell : executedPath){
             MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
-
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             Text tileText = MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).getText();
 
             String prevText = tileText.getText();
@@ -234,7 +243,6 @@ public class RepeatedAStarSearch{
             LOG.debug("\n\n\n");
         }
     }
-
 
     /**
      * Retrieves Neighbour List
