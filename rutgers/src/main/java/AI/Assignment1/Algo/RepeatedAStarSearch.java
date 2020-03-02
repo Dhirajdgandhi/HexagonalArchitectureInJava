@@ -29,6 +29,7 @@ public class RepeatedAStarSearch{
     private XY initialCell, goalCell;
     private int expandedNodes = 0;
     private Map<XY, NodeBase> stateGridWorld;
+    Thread currentThread;
 
     public RepeatedAStarSearch() {
     }
@@ -71,13 +72,9 @@ public class RepeatedAStarSearch{
         NodeBase goalNode = stateGridWorld.get(goalCell);
         NodeBase currentNode = stateGridWorld.get(initialCell);
         int counter = 0, cost = 0;
+        currentThread = Thread.currentThread();
 
         while (!currentNode.equals(goalNode)) {
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             counter += 1;
 
             // Same for B and F
@@ -142,6 +139,18 @@ public class RepeatedAStarSearch{
                         cost += 1;
                         executedPath.add(cell);
                         LOG.debug("Moved to Cell : {}", cell);
+                        MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
+                        Text tileText = MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).getText();
+
+                        String prevText = tileText.getText();
+                        tileText.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(cost));
+                        tileText.setFill(Color.BLACK);
+                        try {
+                            currentThread.sleep(50);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
                         currentNode = stateGridWorld.get(cell);
                     } else {
                         // Run AStar with currentNode again
@@ -156,21 +165,11 @@ public class RepeatedAStarSearch{
         }
 
         LOG.info("Executed Path : {}", executedPath);
-        int executingStep = 1;
-        for(XY cell : executedPath){
-            MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).changeColor(Color.YELLOW);
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            Text tileText = MainScreen.getCurrentGrid().get(cell.getY()).get(cell.getX()).getText();
-
-            String prevText = tileText.getText();
-            tileText.setText((prevText.isEmpty() ? "" : (prevText+","))+String.valueOf(executingStep));
-            tileText.setFill(Color.BLACK);
-            executingStep+=1;
-        }
+//        int executingStep = 1;
+//        for(XY cell : executedPath){
+//
+//            executingStep+=1;
+//        }
         return cost;
     }
 
@@ -199,7 +198,7 @@ public class RepeatedAStarSearch{
 
             closedList.add(currentNode.getXy());
             if(gridWorld.getGridWorld().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()) != BLOCKED_CELL){
-                MainScreen.getCurrentGrid().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GRAY);
+                MainScreen.getCurrentGrid().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GREY);
             }
             for (XY neighbour : retrieveNeighbours(currentNode)) {
                 if (isCellLegalAndUnBlocked(neighbour, false)) {
