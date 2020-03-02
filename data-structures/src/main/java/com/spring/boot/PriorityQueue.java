@@ -90,7 +90,7 @@ public class PriorityQueue<T>{
         queue = newQueue;
 //        heapSort.maxHeapify(queue, 0, queue.size() - 1);
         heapSort.sort(queue);
-        return false;
+        return true;
     }
 
 //    @Override
