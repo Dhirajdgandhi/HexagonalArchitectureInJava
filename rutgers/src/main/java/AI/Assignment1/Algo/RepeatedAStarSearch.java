@@ -285,8 +285,10 @@ public class RepeatedAStarSearch{
         public int compare(NodeBase c1, NodeBase c2) {
             int value = (c1.getFValue() - c2.getFValue());
             if(value==0){
-                value = (c1.getGValue() - c2.getGValue());
+                LOG.debug("Breaking tie between Node : {} and Node : {}", c1, c2);
+                value = (c2.getGValue() - c1.getGValue());
             }
+            LOG.debug("And {} wins", value>0 ? c2 : c1);
             return value;
         }
     };
