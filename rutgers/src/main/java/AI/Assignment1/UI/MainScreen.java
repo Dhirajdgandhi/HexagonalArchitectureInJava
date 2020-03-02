@@ -35,8 +35,8 @@ public class MainScreen extends Application {
     Stage window, forwardWindow, backwardWindow, adaptiveWindow;
     Scene mainScene, secondScene, forwardScene, backwardScene, adaptiveScene;
 
-    private static final int TILE_SIZE = 40;
-    private static final int CELLS = 10;
+    private static final int TILE_SIZE = 20;
+    private static final int CELLS = 50;
     private static final int SIZE = CELLS * TILE_SIZE;
 
     // Independent Grids for all possible searches

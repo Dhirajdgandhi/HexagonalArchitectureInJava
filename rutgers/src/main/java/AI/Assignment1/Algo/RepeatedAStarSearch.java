@@ -196,7 +196,10 @@ public class RepeatedAStarSearch{
             LOG.debug("Exploring Node : {} : {}", currentNode.getXy(), currentNode);
             expandedNodes += 1;
 
+            //Remove he current Node that we explored from top of Open List
+            openList.poll();
             closedList.add(currentNode.getXy());
+
             if(gridWorld.getGridWorld().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()) != BLOCKED_CELL){
                 MainScreen.getCurrentGrid().get(currentNode.getXy().getX()).get(currentNode.getXy().getY()).changeColor(Color.GREY);
             }
@@ -231,8 +234,7 @@ public class RepeatedAStarSearch{
                     }
                 }
             }
-            //Remove he current Node that we explored from top of Open List
-            openList.poll();
+
             // Get the next Top of Open List if it's not empty
             if (!openList.isEmpty()) {
                 currentNode = openList.peek();
